@@ -1,6 +1,8 @@
 #include "para.cpp"
 using namespace std;
 
+#define judge(xxx, robotId) if (rt[robotId].cmd.xxx) printf("xxx %d\n", robotId);
+
 void readPlat() {
     char line[1024];
     for (int i = 0; i < 100; ++i) {
@@ -41,6 +43,14 @@ void readInfo() {
     fgets(line, sizeof line, stdin); // receive OK
 }
 
+void printRobotCommand(int robotId) {
+    printf("forward %d %d\n", robotId, rt[robotId].cmd.forward);
+    printf("rotate %d %f\n", robotId, rt[robotId].cmd.rotate);
+    if (rt[robotId].cmd.sell)  printf("sell %d\n", robotId);
+    if (rt[robotId].cmd.buy)  printf("buy %d\n", robotId);
+    if (rt[robotId].cmd.destroy)  printf("destroy %d\n", robotId);
+}
+
 int main() {
     readPlat();
     puts("OK");
@@ -49,11 +59,11 @@ int main() {
     while (scanf("%d", &frameID) != EOF) {
         readInfo();
         printf("%d\n", frameID);
-        int lineSpeed = 3;
-        double angleSpeed = 1.5;
+        /* ********* BEGIN ********* */
+        
+        /* ********* FINISH ********* */
         for(int robotId = 0; robotId < 4; robotId++){
-            printf("forward %d %d\n", robotId, lineSpeed);
-            printf("rotate %d %f\n", robotId, angleSpeed);
+            printRobotCommand(robotId);
         }
         printf("OK\n");
         fflush(stdout);

@@ -1,0 +1,8 @@
+#忽略文件夹xxx内的文件 /xxx/
+
+#忽略.exe, .json结尾的文件
+*.exe
+*.json
+
+#忽略test.cpp
+test.cpp

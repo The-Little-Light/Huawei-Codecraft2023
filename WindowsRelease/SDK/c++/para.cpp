@@ -18,6 +18,14 @@ struct workbench {
     int pstatus; // 产品格状态   Product status
 };
 
+struct command {
+    double forward;
+    double rotate;
+    bool buy = false;
+    bool sell = false;
+    bool destroy = false;
+};
+
 struct robot {
     int wb_id;    // 所处工作台ID
     int pd_id;    // 携带产品类型
@@ -27,6 +35,7 @@ struct robot {
     vec lsp;      // Linear speed
     double toward; // 朝向，弧度制
     coordinate location;
+    command cmd;  // 当前帧要发布的控制指令
 };
 
 int K;                         // 工作台数
