@@ -1,8 +1,10 @@
 #bin/bash
 
-if [ $# -lt 1 ] || [ "$1" = "-?" ]
+if [ $# -lt 1 ] || [ "$1" = "-?" || "$1" = "-h" || "$1" = "--help" || "$1" = "/?" || "$1" = "/h" || "$1" = "/help" ]
 then
     echo "Usage: $0 <dir of source code> [name]"
+    echo "Example: $0 .\run_test.sh .\src"
+    echo "Example: $0 .\run_test.sh .\src x"
     exit 1
 fi
 
@@ -39,7 +41,6 @@ no=""
 if [ -d map ]
 then
     echo "" >${target}result.txt
-    mkdir ${target}result
     mkdir ${target}replay
     #对于map中的每个文件
     for file in ./map/*
@@ -57,11 +58,16 @@ then
         fi
         id=$((id+1))
     done
-    #输出测例数、平均分和错误测例编号
-    echo "Total: "$id
-    #平均分输出小数点后4位
-    echo "Average: "`awk "BEGIN{printf \\"%.4f\n\\",$score/$id}"`
-    echo "Wrong: "$no
+
+    tmp="Total: "$id
+    echo $tmp >>${target}result.txt
+    echo $tmp
+    tmp="Average: "`awk "BEGIN{printf \\"%.4f\n\\",$score/$id}"`
+    echo $tmp >>${target}result.txt
+    echo $tmp
+    tmp="Wrong: "$no
+    echo $tmp >>${target}result.txt
+    echo $tmp
 fi
 
 rm -r ./replay
