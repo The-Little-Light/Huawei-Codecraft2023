@@ -1,7 +1,5 @@
-#include "para.cpp"
+#include "solution.hpp"
 using namespace std;
-
-#define judge(xxx, robotId) if (rt[robotId].cmd.xxx) printf("xxx %d\n", robotId);
 
 void readPlat() {
     char line[1024];
@@ -59,9 +57,9 @@ int main() {
     while (scanf("%d", &frameID) != EOF) {
         readInfo();
         printf("%d\n", frameID);
-        /* ********* BEGIN ********* */
-        
-        /* ********* FINISH ********* */
+        /**** CORE ****/
+        solution();
+        /**************/
         for(int robotId = 0; robotId < 4; robotId++){
             printRobotCommand(robotId);
         }

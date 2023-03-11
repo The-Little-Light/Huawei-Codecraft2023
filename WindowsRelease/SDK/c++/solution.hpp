@@ -42,3 +42,5 @@ int K;                         // 工作台数
 robot rt[ROBOT_SIZE];          // 机器人
 workbench wb[WORKBENCH_SIZE];  // 工作台
 char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
+
+void solution();
