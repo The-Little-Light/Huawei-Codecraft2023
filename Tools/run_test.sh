@@ -1,10 +1,10 @@
 #bin/bash
 
-if [ $# -lt 1 ] || [ "$1" = "-?" || "$1" = "-h" || "$1" = "--help" || "$1" = "/?" || "$1" = "/h" || "$1" = "/help" ]
+if [ "$1" = "-?" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$1" = "/?" ] || [ "$1" = "/h" ] || [ "$1" = "/help" ] || [ $# -lt 1 ]
 then
     echo "Usage: $0 <dir of source code> [name]"
-    echo "Example: $0 .\run_test.sh .\src"
-    echo "Example: $0 .\run_test.sh .\src x"
+    echo "Example: $0 .\src"
+    echo "Example: $0 .\src x"
     exit 1
 fi
 
