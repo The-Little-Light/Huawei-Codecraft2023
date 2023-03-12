@@ -7,6 +7,10 @@
 #define vec coordinate
 using namespace std;
 
+double para1 = 1;
+double para2 = 100;
+double para3 = 1;
+
 struct coordinate {
     double x, y;
     void set(double xx, double yy) {x = xx; y = yy;}
