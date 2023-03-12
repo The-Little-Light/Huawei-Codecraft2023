@@ -10,6 +10,47 @@ map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 
 pair<int,int> profitAndTime[8];
 
+void init() {
+    profitAndTime[1] = make_pair(6000-3000, 50);
+    profitAndTime[2] = make_pair(7600-4400, 50);
+    profitAndTime[3] = make_pair(9200-5800, 50);
+    profitAndTime[4] = make_pair(22500-15400, 500);
+    profitAndTime[5] = make_pair(25000-17200, 500);
+    profitAndTime[6] = make_pair(27500-19200, 500);
+    profitAndTime[7] = make_pair(105000-76000, 1000);
+    // 初始化 type2BuyIndex，为收购方建立索引
+    for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
+        switch (wb[wbIdx].type) {
+        case 4:
+            type2BuyIndex[1].push_back(wbIdx);
+            type2BuyIndex[2].push_back(wbIdx);
+            break;
+        case 5:
+            type2BuyIndex[1].push_back(wbIdx);
+            type2BuyIndex[3].push_back(wbIdx);
+            break;
+        case 6:
+            type2BuyIndex[2].push_back(wbIdx);
+            type2BuyIndex[3].push_back(wbIdx);
+            break;
+        case 7:
+            type2BuyIndex[4].push_back(wbIdx);
+            type2BuyIndex[5].push_back(wbIdx);
+            type2BuyIndex[6].push_back(wbIdx);
+            break;
+        case 8:
+            type2BuyIndex[7].push_back(wbIdx);
+            break;
+        case 9:
+            for (int i = 1; i <= 7; ++i) {
+                type2BuyIndex[i].push_back(wbIdx);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+}
 
 
 void readPlat() {
@@ -61,11 +102,16 @@ void printRobotCommand(int robotId) {
 }
 
 int main() {
+    bool initMark = true;
     readPlat();
     puts("OK");
     fflush(stdout);
     int frameID;
     while (scanf("%d", &frameID) != EOF) {
+        if (initMark) {
+            init();
+            initMark = false;
+        }
         readInfo();
         printf("%d\n", frameID);
         /**** CORE ****/
