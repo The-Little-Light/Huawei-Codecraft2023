@@ -1,3 +1,5 @@
+#ifndef SOLUTION_HPP
+#define SOLUTION_HPP
 #include <bits/stdc++.h>
 #define MAP_SIZE 100
 #define WORKBENCH_SIZE 50
@@ -90,17 +92,16 @@ struct robot {
 
     queue<task> taskQueue; // 任务队列
     misson curMisson;
-    void checkDest();
-    void checkTask();
 };
 
-int K;                         // 工作台数
-robot rt[ROBOT_SIZE];          // 机器人
-workbench wb[WORKBENCH_SIZE];  // 工作台
-char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
+extern int K;                         // 工作台数
+extern robot rt[ROBOT_SIZE];          // 机器人
+extern workbench wb[WORKBENCH_SIZE];  // 工作台
+extern char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
 
-map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
+extern map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 
-pair<int,int> profitAndTime[8];
+extern pair<int,int> profitAndTime[8];
 
 void solution();
+#endif
