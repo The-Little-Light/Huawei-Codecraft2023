@@ -1,6 +1,17 @@
 #include "solution.hpp"
 using namespace std;
 
+int K;                         // 工作台数
+robot rt[ROBOT_SIZE];          // 机器人
+workbench wb[WORKBENCH_SIZE];  // 工作台
+char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
+
+map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
+
+pair<int,int> profitAndTime[8];
+
+
+
 void readPlat() {
     char line[1024];
     for (int i = 0; i < 100; ++i) {

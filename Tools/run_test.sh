@@ -28,7 +28,17 @@ then
 fi
 
 mkdir $target
-g++ -std=c++14 -O2 -o $target"main.exe" $source"main.cpp"
+if [ ! -d $source"build" ]
+then
+    mkdir $source"build"
+fi
+now=`pwd`
+cd $source"build"
+rm -rf *
+cmake .. -G "MinGW Makefiles"
+mingw32-make -j
+cd $now
+cp $source"build\main.exe" $target
 if [ $? -ne 0 ]
 then
     echo "Compilation error"

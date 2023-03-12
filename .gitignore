@@ -6,3 +6,6 @@
 
 #忽略test.cpp
 test.cpp
+
+#忽略cmake的临时文件
+build/
