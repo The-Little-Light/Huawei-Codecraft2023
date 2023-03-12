@@ -6,9 +6,6 @@ date:       2023-3-11
 describe:   第一版bassline
 ******************************/
 
-double para1 = 1;
-double para2 = 100;
-double para3 = 1;
 
 bool cmp(misson& a, misson& b) {
     return a.v > b.v;
