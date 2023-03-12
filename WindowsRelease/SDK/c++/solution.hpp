@@ -7,10 +7,6 @@
 #define vec coordinate
 using namespace std;
 
-double para1 = 1;
-double para2 = 100;
-double para3 = 1;
-
 struct coordinate {
     double x, y;
     void set(double xx, double yy) {x = xx; y = yy;}
@@ -67,6 +63,11 @@ struct misson {
     int endIndex;   // 终点工作台下标
     int proType;    // 产品型号
     double v = 0;   // 价值函数
+    
+double para1 = 1;
+double para2 = 100;
+double para3 = 1;
+
 
     // double dis(int s, int e) {
     //     coordinate& c1 = wb[s].location;
