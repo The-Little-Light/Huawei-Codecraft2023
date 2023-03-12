@@ -64,18 +64,18 @@ struct misson {
     int proType;    // 产品型号
     double v = 0;   // 价值函数
 
-    double dis(int s, int e) {
-        coordinate& c1 = wb[s].location;
-        coordinate& c2 = wb[e].location;
-        double ans = (c1.x - c2.x)*(c1.x - c2.x) + (c1.y - c2.y)*(c1.y - c2.y);
-        return sqrt(ans);
-    }
+    // double dis(int s, int e) {
+    //     coordinate& c1 = wb[s].location;
+    //     coordinate& c2 = wb[e].location;
+    //     double ans = (c1.x - c2.x)*(c1.x - c2.x) + (c1.y - c2.y)*(c1.y - c2.y);
+    //     return sqrt(ans);
+    // }
     misson(int s, int e, int p) {
         startIndex = s;
         endIndex = e;
         proType = p;
-        v = profitAndTime[p].first * para1 + para2 / dis(s,e);
     }
+    misson(){};
 };
 
 struct robot {
@@ -92,6 +92,8 @@ struct robot {
 
     queue<task> taskQueue; // 任务队列
     misson curMisson;
+    void checkDest();
+    void checkTask();
 };
 
 extern int K;                         // 工作台数

@@ -5,6 +5,7 @@ then
     echo "Usage: $0 <dir of source code> [name]"
     echo "Example: $0 .\src"
     echo "Example: $0 .\src x"
+    echo "Example: $0 ..\WindowsRelease\SDK\c++ xzx"
     exit 1
 fi
 
@@ -50,16 +51,16 @@ score=0
 no=""
 if [ -d map ]
 then
-    echo "" >${target}result.txt
     mkdir ${target}replay
+    mkdir ${target}result
     #对于map中的每个文件
     for file in ./map/*
     do
         suffix=`basename $file | cut -d . -f 1`
-        ./bin/robot -f -s $RANDOM -r $target"replay/$suffix.rep" -m $file -c $target "main.exe" >>${target}result.txt
+        ./bin/robot -f -s $RANDOM -r $target"replay/$suffix.rep" -m $file -c $target "main.exe" 1>>${target}"result.txt" 2>${target}"result/"${suffix}".txt"
         tmp=`tail -n 1 ${target}result.txt`
         t1=`echo $tmp | jq .status`
-        if [ $t1 = '"Successful"' ]
+        if [ "$t1" = '"Successful"' ]
         then
             t2=`echo $tmp | jq .score`
             score=$((score+t2))

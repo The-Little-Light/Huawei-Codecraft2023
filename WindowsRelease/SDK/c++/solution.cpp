@@ -62,26 +62,7 @@ void robot::checkTask() {
     task& curTask = taskQueue.front();
     setSpeed(curTask.destCo);
 }
-
-void solution() {
-    // 根据已分配任务把工作台信息进行同步
-    for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
-        if (rt[rtIdx].taskQueue.size() == 2) {
-            misson& tmp = rt[rtIdx].curMisson;
-            wb[tmp.startIndex].pstatus = 0;
-            wb[tmp.startIndex].setProType(tmp.proType);
-        }
-        else if (rt[rtIdx].taskQueue.size() == 1) {
-            misson& tmp = rt[rtIdx].curMisson;
-            wb[tmp.startIndex].setProType(tmp.proType);
-        }
-    }
-    // 指令规划
-    for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
-        rt[rtIdx].checkDest();
-        rt[rtIdx].checkTask();
-    }
-    /*
+void motion_test(){
     robot& tmp = rt[0];
     if(tmp.wb_id = tmp.taskQueue.front().destId) {
         while(1){
@@ -94,6 +75,26 @@ void solution() {
     }
     int next = tmp.taskQueue.front().destId;
     tmp.setSpeed(wb[next].location);
-    */
+    cerr<<next<<" "<<tmp.cmd.forward<<" "<<tmp.cmd.rotate<<endl;
+}
+void solution() {
+    // // 根据已分配任务把工作台信息进行同步
+    // for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
+    //     if (rt[rtIdx].taskQueue.size() == 2) {
+    //         misson& tmp = rt[rtIdx].curMisson;
+    //         wb[tmp.startIndex].pstatus = 0;
+    //         wb[tmp.startIndex].setProType(tmp.proType);
+    //     }
+    //     else if (rt[rtIdx].taskQueue.size() == 1) {
+    //         misson& tmp = rt[rtIdx].curMisson;
+    //         wb[tmp.startIndex].setProType(tmp.proType);
+    //     }
+    // }
+    // // 指令规划
+    // for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
+    //     rt[rtIdx].checkDest();
+    //     rt[rtIdx].checkTask();
+    // }
+    motion_test();
     return;
 }

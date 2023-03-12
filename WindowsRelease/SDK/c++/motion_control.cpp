@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-12 22:50:56
- * @LastEditTime: 2023-03-12 22:51:44
+ * @LastEditTime: 2023-03-13 00:47:46
  * @LastEditors: Xzh
  * @Description: 
  */
@@ -24,3 +24,4 @@ void robot::setSpeed(coordinate dest){
     cmd.rotate = angleDiff;
     cmd.forward = dist * cos(angleDiff);
 }
+
