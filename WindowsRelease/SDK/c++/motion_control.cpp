@@ -21,7 +21,7 @@ void robot::setSpeed(coordinate dest){
     if (angleDiff > PI) angleDiff -= 2 * PI;
     if (angleDiff < -PI) angleDiff += 2 * PI;
 
-    cmd.rotate = angleDiff;
-    cmd.forward = dist * cos(angleDiff);
+    cmd.forward = min(6.0, 0.05*dist*dist + 3);
+    cmd.rotate = angleDiff*2;
 }
 

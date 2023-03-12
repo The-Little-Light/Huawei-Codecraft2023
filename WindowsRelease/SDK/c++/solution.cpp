@@ -50,8 +50,8 @@ void robot::checkTask() {
         if (msNode.size() == 0) return;
         misson selected = msNode[0];
         curMisson = selected;
-        taskQueue.push(task(wb[selected.startIndex].location ,selected.startIndex));
-        taskQueue.push(task(wb[selected.endIndex].location ,selected.endIndex));
+        taskQueue.push(task(wb[selected.startIndex].location ,selected.startIndex, 1, 0));
+        taskQueue.push(task(wb[selected.endIndex].location ,selected.endIndex, 0, 1));
         wb[curMisson.startIndex].pstatus = 0;
         wb[curMisson.startIndex].setProType(curMisson.proType);
     }
@@ -75,23 +75,24 @@ void motion_test(){
     cerr<<next<<" "<<tmp.cmd.forward<<" "<<tmp.cmd.rotate<<endl;
 }
 void solution() {
-    // // 根据已分配任务把工作台信息进行同步
-    // for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
-    //     if (rt[rtIdx].taskQueue.size() == 2) {
-    //         misson& tmp = rt[rtIdx].curMisson;
-    //         wb[tmp.startIndex].pstatus = 0;
-    //         wb[tmp.startIndex].setProType(tmp.proType);
-    //     }
-    //     else if (rt[rtIdx].taskQueue.size() == 1) {
-    //         misson& tmp = rt[rtIdx].curMisson;
-    //         wb[tmp.startIndex].setProType(tmp.proType);
-    //     }
-    // }
-    // // 指令规划
-    // for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
-    //     rt[rtIdx].checkDest();
-    //     rt[rtIdx].checkTask();
-    // }
-    motion_test();
+    // 根据已分配任务把工作台信息进行同步
+    for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
+        if (rt[rtIdx].taskQueue.size() == 2) {
+            misson& tmp = rt[rtIdx].curMisson;
+            wb[tmp.startIndex].pstatus = 0;
+            wb[tmp.endIndex].setProType(tmp.proType);
+        }
+        else if (rt[rtIdx].taskQueue.size() == 1) {
+            misson& tmp = rt[rtIdx].curMisson;
+            wb[tmp.endIndex].setProType(tmp.proType);
+        }
+    }
+    // 指令规划
+    for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
+        rt[rtIdx].cmd.clean();
+        rt[rtIdx].checkDest();
+        rt[rtIdx].checkTask();
+    }
+    // motion_test();
     return;
 }
