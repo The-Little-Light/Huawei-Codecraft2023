@@ -1,7 +1,0 @@
-{"status":"Successful","score":200000}
-{"status":"Successful","score":200000}
-{"status":"Successful","score":200000}
-{"status":"Successful","score":200000}
-Total: 4
-Average: 200000.0000
-Wrong:
