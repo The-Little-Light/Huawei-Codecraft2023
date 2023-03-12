@@ -1,3 +1,5 @@
+#ifndef SOLUTION_HPP
+#define SOLUTION_HPP
 #include <bits/stdc++.h>
 #define MAP_SIZE 100
 #define WORKBENCH_SIZE 50
@@ -16,14 +18,28 @@ struct workbench {
     int rtime;   // 剩余生产时间 Remaining production time
     int rstatus; // 原材料格状态 Raw—material status
     int pstatus; // 产品格状态   Product status
+
+    // 判断原材料proType型号格是否为空，空返回false
+    bool checkHaveProType(int proType) {
+        int s = 1;
+        while(proType--) s <<= 1;
+        return s & rstatus;
+    }
 };
 
-struct command {
+struct command { // 汇总当前帧机器人的控制指令
     double forward;
     double rotate;
     bool buy = false;
     bool sell = false;
     bool destroy = false;
+};
+
+struct task { // 机器人的当前目标工作
+    coordinate destCo;  // 目的坐标
+    int destId;         // 目标工作台下标
+    bool buy = false;
+    bool sell = false;
 };
 
 struct robot {
@@ -36,11 +52,21 @@ struct robot {
     double toward; // 朝向，弧度制
     coordinate location;
     command cmd;  // 当前帧要发布的控制指令
+    void setSpeed(coordinate dest); // 负责从当前位置移动到目的地的线速度和角速度指令
+
+    queue<task> taskQueue; // 任务队列
+    void checkDest();
+    void checkTask();
 };
 
-int K;                         // 工作台数
-robot rt[ROBOT_SIZE];          // 机器人
-workbench wb[WORKBENCH_SIZE];  // 工作台
-char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
+extern int K;                         // 工作台数
+extern robot rt[ROBOT_SIZE];          // 机器人
+extern workbench wb[WORKBENCH_SIZE];  // 工作台
+extern char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
+
+extern map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
+
+extern pair<int,int> profitAndTime[8];
 
 void solution();
+#endif
