@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-12 22:50:56
- * @LastEditTime: 2023-03-13 00:47:46
+ * @LastEditTime: 2023-03-13 09:59:07
  * @LastEditors: Xzh
  * @Description: 
  */
@@ -20,6 +20,8 @@ void robot::setSpeed(coordinate dest){
     // angleDiff in [-PI, PI]
     if (angleDiff > PI) angleDiff -= 2 * PI;
     if (angleDiff < -PI) angleDiff += 2 * PI;
+
+    
 
     cmd.rotate = angleDiff;
     cmd.forward = dist * cos(angleDiff);
