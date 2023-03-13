@@ -34,8 +34,9 @@ then
     mkdir $source"build"
 fi
 now=`pwd`
-cd $source"build"
-rm -rf *
+cd $source
+rm -rf ./build/*
+cd build
 cmake .. -G "MinGW Makefiles"
 mingw32-make -j
 cd $now
