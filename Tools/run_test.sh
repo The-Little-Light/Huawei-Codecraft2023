@@ -58,14 +58,28 @@ then
     for file in ./map/*
     do
         suffix=`basename $file | cut -d . -f 1`
-        echo ./bin/robot -f -s $RANDOM -r $target"replay/$suffix.rep" -m $file -c $target "main.exe"
-        ./bin/Robot.exe -f -s $RANDOM -r $target"replay/$suffix.rep" -m $file -c $target "main.exe"
-        
-        
+        ./bin/robot -f -s $RANDOM -r $target"replay/$suffix.rep" -m $file -c $target "main.exe" 1>>${target}"result.txt" 2>${target}"result/"${suffix}".txt"
+        tmp=`tail -n 1 ${target}result.txt`
+        t1=`echo $tmp | jq .status`
+        if [ "$t1" = '"Successful"' ]
+        then
+            t2=`echo $tmp | jq .score`
+            score=$((score+t2))
+        else
+            no=$no" "$suffix
+        fi
         id=$((id+1))
     done
 
-    
+    tmp="Total: "$id
+    echo $tmp >>${target}result.txt
+    echo $tmp
+    tmp="Average: "`awk "BEGIN{printf \\"%.4f\n\\",$score/$id}"`
+    echo $tmp >>${target}result.txt
+    echo $tmp
+    tmp="Wrong: "$no
+    echo $tmp >>${target}result.txt
+    echo $tmp
 fi
 
 rm -r ./replay
