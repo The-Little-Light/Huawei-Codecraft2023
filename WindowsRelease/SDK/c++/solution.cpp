@@ -6,28 +6,37 @@ date:       2023-3-11
 describe:   第一版bassline
 ******************************/
 
-
 bool cmp(misson& a, misson& b) {
     return a.v > b.v;
 }
 
-void findMission(vector<misson>& msNode) {
+void findMission(vector<misson>& msNode, coordinate& rtCo) {
     for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
         // 寻找有现成产品的工作台
         if (wb[wbIdx].pstatus) {
             int proType = wb[wbIdx].type;
             // 遍历收购方
             for (auto buyWbIdx: type2BuyIndex[proType]) {
-                // 对应原材料格为空
-                if (!wb[buyWbIdx].checkHaveProType(proType)) {
+                // 收购方是8或9号工作台，或者，对应原材料格为空
+                if (wb[buyWbIdx].type > 7 || !wb[buyWbIdx].checkHaveProType(proType)) {
                     // 此时从 wbIdx 到 buyWbIdx 是一个潜在任务
-                    msNode.push_back(misson(wbIdx, buyWbIdx, proType));
-                }
+                    misson pot = misson(wbIdx, buyWbIdx, proType);
+                    pot.countValue(rtCo, proType);
+                    msNode.push_back(pot);
+                } 
             }
         }
     }
     sort(msNode.begin(), msNode.end(), cmp);
 }
+
+void misson::countValue(coordinate& rtCo, int proType) {
+    // 计算价值函数
+    double dd = dis(rtCo, wb[startIndex].location) 
+        + dis(wb[startIndex].location, wb[endIndex].location);
+    double vv = profitAndTime[proType].first;
+    v = para1 / dd + para2 * vv;
+} 
 
 void robot::checkDest() {
     if (!taskQueue.empty()) {
@@ -46,19 +55,20 @@ void robot::checkTask() {
         // 分配新任务
         // 无空闲任务时如何处理？
         vector<misson> msNode; // 任务节点
-        findMission(msNode);
+        findMission(msNode, location);
         if (msNode.size() == 0) return;
         misson selected = msNode[0];
         curMisson = selected;
         taskQueue.push(task(wb[selected.startIndex].location ,selected.startIndex, 1, 0));
         taskQueue.push(task(wb[selected.endIndex].location ,selected.endIndex, 0, 1));
         wb[curMisson.startIndex].pstatus = 0;
-        wb[curMisson.startIndex].setProType(curMisson.proType);
+        wb[curMisson.endIndex].setProType(curMisson.proType);
     }
     // 执行当前任务，前往目的地
     task& curTask = taskQueue.front();
     setSpeed(curTask.destCo);
 }
+
 void motion_test(){
     robot& tmp = rt[0];
     if(tmp.wb_id = tmp.taskQueue.front().destId) {
@@ -74,6 +84,7 @@ void motion_test(){
     tmp.setSpeed(wb[next].location);
     cerr<<next<<" "<<tmp.cmd.forward<<" "<<tmp.cmd.rotate<<endl;
 }
+
 void solution() {
     // 根据已分配任务把工作台信息进行同步
     for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {

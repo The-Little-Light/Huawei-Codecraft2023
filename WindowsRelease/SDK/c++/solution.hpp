@@ -13,7 +13,7 @@ struct coordinate {
 };
 
 struct workbench {
-    int type;
+    int type;    // 工作台类型 
     coordinate location;
     int rtime;   // 剩余生产时间 Remaining production time
     int rstatus; // 原材料格状态 Raw—material status
@@ -56,6 +56,12 @@ struct task { // 机器人的当前目标工作
     }
 };
 
+struct parameter {
+    double para1, para2;
+    parameter() {
+        
+    }
+};
 
 /* 
 定义任务 m(A, x, B) 表示把物品x从A工作台购入并出售给B工作台
@@ -69,23 +75,20 @@ struct misson {
     int proType;    // 产品型号
     double v = 0;   // 价值函数
     
-double para1 = 1;
-double para2 = 100;
-double para3 = 1;
+    double para1 = 1000000;
+    double para2 = 6;
 
-
-    // double dis(int s, int e) {
-    //     coordinate& c1 = wb[s].location;
-    //     coordinate& c2 = wb[e].location;
-    //     double ans = (c1.x - c2.x)*(c1.x - c2.x) + (c1.y - c2.y)*(c1.y - c2.y);
-    //     return sqrt(ans);
-    // }
+    double dis(coordinate& c1, coordinate& c2) {
+        double ans = (c1.x - c2.x)*(c1.x - c2.x) + (c1.y - c2.y)*(c1.y - c2.y);
+        return sqrt(ans);
+    }
     misson(int s, int e, int p) {
         startIndex = s;
         endIndex = e;
         proType = p;
     }
     misson(){};
+    void countValue(coordinate& rtCo, int proType);
 };
 
 struct robot {
