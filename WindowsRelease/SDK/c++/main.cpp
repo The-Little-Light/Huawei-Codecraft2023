@@ -96,6 +96,8 @@ void readInfo() {
 void printRobotCommand(int robotId) {
     printf("forward %d %f\n", robotId, rt[robotId].cmd.forward);
     printf("rotate %d %f\n", robotId, rt[robotId].cmd.rotate);
+    cerr << "rotate " << robotId << " " << rt[robotId].cmd.rotate << endl;
+    cerr << "forward " << robotId << " " << rt[robotId].cmd.forward << endl;
     if (rt[robotId].cmd.sell)  printf("sell %d\n", robotId);
     if (rt[robotId].cmd.buy)  printf("buy %d\n", robotId);
     if (rt[robotId].cmd.destroy)  printf("destroy %d\n", robotId);
