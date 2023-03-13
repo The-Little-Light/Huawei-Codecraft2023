@@ -33,11 +33,14 @@ struct workbench {
 };
 
 struct command { // 汇总当前帧机器人的控制指令
-    double forward;
-    double rotate;
+    double forward = 0;
+    double rotate = 0;
     bool buy = false;
     bool sell = false;
     bool destroy = false;
+    void clean() {
+        buy = sell = destroy = false;
+    }
 };
 
 struct task { // 机器人的当前目标工作
@@ -45,9 +48,11 @@ struct task { // 机器人的当前目标工作
     int destId;         // 目标工作台下标
     bool buy = false;
     bool sell = false;
-    task(coordinate c, int d) {
+    task(coordinate c, int d, bool b, bool s) {
         destCo = c;
         destId = d;
+        buy = b;
+        sell = s;
     }
 };
 

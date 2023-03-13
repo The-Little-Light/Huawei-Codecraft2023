@@ -94,7 +94,7 @@ void readInfo() {
 }
 
 void printRobotCommand(int robotId) {
-    printf("forward %d %d\n", robotId, rt[robotId].cmd.forward);
+    printf("forward %d %f\n", robotId, rt[robotId].cmd.forward);
     printf("rotate %d %f\n", robotId, rt[robotId].cmd.rotate);
     cerr << "rotate " << robotId << " " << rt[robotId].cmd.rotate << endl;
     cerr << "forward " << robotId << " " << rt[robotId].cmd.forward << endl;
@@ -110,11 +110,11 @@ int main() {
     fflush(stdout);
     int frameID;
     while (scanf("%d", &frameID) != EOF) {
+        readInfo();
         if (initMark) {
             init();
             initMark = false;
         }
-        readInfo();
         printf("%d\n", frameID);
         /**** CORE ****/
         solution();
