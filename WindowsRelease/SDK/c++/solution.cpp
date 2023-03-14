@@ -2,12 +2,17 @@
 
 /******************************
 author:     xiezx
-date:       2023-3-11
-describe:   第一版bassline
+date:       2023-3-13
+describe:   运动路径优化+碰撞避免 
 ******************************/
 
 bool cmp(misson& a, misson& b) {
     return a.v > b.v;
+}
+
+double dis(coordinate& c1, coordinate& c2) {
+    double ans = (c1.x - c2.x)*(c1.x - c2.x) + (c1.y - c2.y)*(c1.y - c2.y);
+    return sqrt(ans);
 }
 
 void findMission(vector<misson>& msNode, coordinate& rtCo) {
@@ -69,21 +74,21 @@ void robot::checkTask() {
     setSpeed(curTask.destCo);
 }
 
-void motion_test(){
-    robot& tmp = rt[0];
-    if(tmp.wb_id = tmp.taskQueue.front().destId) {
-        while(1){
-            int next = rand()%K;
-            if(next != tmp.wb_id) {
-                tmp.taskQueue.front().destId = next;
-                break;
-            }
-        }
-    }
-    int next = tmp.taskQueue.front().destId;
-    tmp.setSpeed(wb[next].location);
-    cerr<<next<<" "<<tmp.cmd.forward<<" "<<tmp.cmd.rotate<<endl;
-}
+// void motion_test(){
+//     robot& tmp = rt[0];
+//     if(tmp.wb_id = tmp.taskQueue.front().destId) {
+//         while(1){
+//             int next = rand()%K;
+//             if(next != tmp.wb_id) {
+//                 tmp.taskQueue.front().destId = next;
+//                 break;
+//             }
+//         }
+//     }
+//     int next = tmp.taskQueue.front().destId;
+//     tmp.setSpeed(wb[next].location);
+//     cerr<<next<<" "<<tmp.cmd.forward<<" "<<tmp.cmd.rotate<<endl;
+// }
 
 void solution() {
     // 根据已分配任务把工作台信息进行同步
@@ -100,10 +105,12 @@ void solution() {
     }
     // 指令规划
     for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
-        rt[rtIdx].cmd.clean();
-        rt[rtIdx].checkDest();
-        rt[rtIdx].checkTask();
+        if (rt[rtIdx].holdTime) --rt[rtIdx].holdTime;
+        rt[rtIdx].cmd.clean(); // 清除之前指令设置
+        rt[rtIdx].checkDest(); // 检查是否到达目的地
+        rt[rtIdx].checkTask(); // 任务执行->运动指令
     }
-    // motion_test();
+    // 碰撞避免
+    // collitionAvoidance();
     return;
 }

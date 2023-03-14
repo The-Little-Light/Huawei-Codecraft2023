@@ -12,6 +12,8 @@ struct coordinate {
     void set(double xx, double yy) {x = xx; y = yy;}
 };
 
+extern double dis(coordinate& c1, coordinate& c2);
+
 struct workbench {
     int type;    // 工作台类型 
     coordinate location;
@@ -77,11 +79,6 @@ struct misson {
     
     double para1 = 1000000;
     double para2 = 6;
-
-    double dis(coordinate& c1, coordinate& c2) {
-        double ans = (c1.x - c2.x)*(c1.x - c2.x) + (c1.y - c2.y)*(c1.y - c2.y);
-        return sqrt(ans);
-    }
     misson(int s, int e, int p) {
         startIndex = s;
         endIndex = e;
@@ -107,6 +104,10 @@ struct robot {
     misson curMisson;
     void checkDest();
     void checkTask();
+
+    // 碰撞避免持续时间
+    int holdTime = 0;
+    bool leftOrRight = 0; // left:0, right:1
 };
 
 extern int K;                         // 工作台数
@@ -118,5 +119,6 @@ extern map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方
 
 extern pair<int,int> profitAndTime[8];
 
+void collitionAvoidance();
 void solution();
 #endif
