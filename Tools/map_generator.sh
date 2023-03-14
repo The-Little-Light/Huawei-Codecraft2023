@@ -1,9 +1,9 @@
 #/bin/bash
 
 number=1000
-if [ ! -d "./map" ]
+if [ ! -d "./maps" ]
 then
-    mkdir "./map"
+    mkdir "./maps"
 fi
 
 #帮助
@@ -32,6 +32,6 @@ then
     number=$1
     for ((i=5; i<$number; i++))
     do
-        ./bin/generator.exe >"./map/"$i.txt
+        ./bin/generator.exe >"./maps/"$i.txt
     done
 fi

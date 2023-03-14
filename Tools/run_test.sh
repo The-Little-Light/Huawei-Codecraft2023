@@ -9,6 +9,12 @@ then
     exit 1
 fi
 
+if [ "$4" = "clear" ]
+then
+    sh ./clear.sh $2
+    clear
+fi
+
 source="$1"
 id=1
 pre=""
@@ -35,7 +41,7 @@ then
 fi
 now=`pwd`
 cd $source
-rm -rf ./build/*
+# rm -rf ./build/*
 cd build
 cmake .. -G "MinGW Makefiles"
 mingw32-make -j
@@ -50,13 +56,13 @@ fi
 id=0
 score=0
 no=""
-if [ -d map ]
+if [ -d maps ]
 then
     mkdir ${target}replay
     mkdir ${target}result
-    #对于map中的每个文件
-    for file in ./map/*
-    do
+    if [ $# -ge 3 ]
+    then 
+        file="./maps/"$3
         suffix=`basename $file | cut -d . -f 1`
         ./bin/robot -f -s $RANDOM -r $target"replay/$suffix.rep" -m $file -c $target "main.exe" 1>>${target}"result.txt" 2>${target}"result/"${suffix}".txt"
         tmp=`tail -n 1 ${target}result.txt`
@@ -69,9 +75,26 @@ then
             no=$no" "$suffix
         fi
         id=$((id+1))
-    done
+    else
+        #对于map中的每个文件
+        for file in ./maps/*
+        do
+            suffix=`basename $file | cut -d . -f 1`
+            ./bin/robot -f -s $RANDOM -r $target"replay/$suffix.rep" -m $file -c $target "main.exe" 1>>${target}"result.txt" 2>${target}"result/"${suffix}".txt"
+            tmp=`tail -n 1 ${target}result.txt`
+            t1=`echo $tmp | jq .status`
+            if [ "$t1" = '"Successful"' ]
+            then
+                t2=`echo $tmp | jq .score`
+                score=$((score+t2))
+            else
+                no=$no" "$suffix
+            fi
+            id=$((id+1))
+        done
+    fi
 
-    tmp="Total: "$id
+    tmp="Total: "$score
     echo $tmp >>${target}result.txt
     echo $tmp
     tmp="Average: "`awk "BEGIN{printf \\"%.4f\n\\",$score/$id}"`
