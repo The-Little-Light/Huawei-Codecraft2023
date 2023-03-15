@@ -108,6 +108,7 @@ struct robot {
     // 碰撞避免持续时间
     int holdTime = 0;
     bool leftOrRight = 0; // left:0, right:1
+    vec avoidance;
 };
 
 extern int K;                         // 工作台数
