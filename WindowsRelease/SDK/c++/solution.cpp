@@ -142,6 +142,6 @@ void solution() {
         rt[rtIdx].checkTask(); // 任务执行->运动指令
     }
     // 碰撞避免
-    // collitionAvoidance();
+    collitionAvoidance();
     return;
 }
