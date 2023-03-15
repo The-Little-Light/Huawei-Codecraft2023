@@ -32,6 +32,15 @@ struct workbench {
         while(proType--) s <<= 1;
         rstatus = s | rstatus;
     }
+    // 计算当前已拥有原材料数量
+    int rawMaterNum() {
+        int r = rstatus, cnt = 0;
+        while (r) {
+            if (r & 1) cnt++;
+            r >>= 1;
+        }
+        return cnt;
+    }
 };
 
 struct command { // 汇总当前帧机器人的控制指令
@@ -79,7 +88,7 @@ struct misson {
     double estFrame = 0; // 估计任务消耗帧数
     
     double para1 = 950000;
-    double para2 = 6;
+    double para2 = 7;
     misson(int s, int e, int p) {
         startIndex = s;
         endIndex = e;

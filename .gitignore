@@ -3,9 +3,11 @@
 #忽略.exe, .json结尾的文件
 *.exe
 *.json
+*.zip
 
 #忽略test.cpp
 test.cpp
+mergeMain.sh
 
 #忽略cmake的临时文件
 build/
