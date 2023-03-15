@@ -7,19 +7,23 @@
  *      碰撞避免，分类讨论
  ***/
 #include "solution.hpp"
+// 向量模
+double modulusOfVector(vec& a) {
+    return sqrt(a.x*a.x + a.y*a.y);
+}
 
 // 向量叉积
-double crossProduct(coordinate& a, coordinate& b) {
+double crossProduct(vec& a, vec& b) {
     return a.x * b.y - a.y * b.x;
 }
 
 // 向量点乘
-double dotProduct(coordinate& a, coordinate& b) {
+double dotProduct(vec& a, vec& b) {
     return a.x * b.x + a.y * b.y;
 }
 
 // 向量夹角
-double angle(coordinate& a, coordinate& b) {
+double angle(vec& a, vec& b) {
     return acos(dotProduct(a, b) / (dis(a, b) * dis(a, b)));
 }
 

@@ -8,6 +8,7 @@
 #include "solution.hpp"
 using namespace std;
 
+int frameID;
 int K;                         // 工作台数
 robot rt[ROBOT_SIZE];          // 机器人
 workbench wb[WORKBENCH_SIZE];  // 工作台
@@ -18,6 +19,7 @@ map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 pair<int,int> profitAndTime[8];
 
 void init() {
+    for (int i = 0; i < 4; ++i) rt[i].rtIdx = i+1;
     profitAndTime[1] = make_pair(6000-3000, 50);
     profitAndTime[2] = make_pair(7600-4400, 50);
     profitAndTime[3] = make_pair(9200-5800, 50);
@@ -115,7 +117,6 @@ int main() {
     readPlat();
     puts("OK");
     fflush(stdout);
-    int frameID;
     while (scanf("%d", &frameID) != EOF) {
         readInfo();
         if (initMark) {

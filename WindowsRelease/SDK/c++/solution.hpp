@@ -9,10 +9,10 @@ using namespace std;
 
 struct coordinate {
     double x, y;
+    coordinate() {};
+    coordinate(double xx, double yy) {x = xx; y = yy;}
     void set(double xx, double yy) {x = xx; y = yy;}
 };
-
-extern double dis(coordinate& c1, coordinate& c2);
 
 struct workbench {
     int type;    // 工作台类型 
@@ -76,8 +76,9 @@ struct misson {
     int endIndex;   // 终点工作台下标
     int proType;    // 产品型号
     double v = 0;   // 价值函数
+    double estFrame = 0; // 估计任务消耗帧数
     
-    double para1 = 1000000;
+    double para1 = 950000;
     double para2 = 6;
     misson(int s, int e, int p) {
         startIndex = s;
@@ -85,10 +86,11 @@ struct misson {
         proType = p;
     }
     misson(){};
-    void countValue(coordinate& rtCo, int proType);
+    void countValue(coordinate& rtCo, int proType, vec& lsp);
 };
 
 struct robot {
+    int rtIdx;
     int wb_id;    // 所处工作台ID
     int pd_id;    // 携带产品类型
     double tvc;   // 时间价值系数 Time value coefficient
@@ -111,15 +113,21 @@ struct robot {
     vec avoidance;
 };
 
+extern int frameID;                   // 当前帧
 extern int K;                         // 工作台数
 extern robot rt[ROBOT_SIZE];          // 机器人
 extern workbench wb[WORKBENCH_SIZE];  // 工作台
 extern char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
+extern double PI;                     // 圆周率
 
 extern map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 
 extern pair<int,int> profitAndTime[8];
 
+extern double dis(coordinate& c1, coordinate& c2);
+extern double crossProduct(vec& a, vec& b);
+extern double dotProduct(vec& a, vec& b);
+extern double modulusOfVector(vec& a);
 void collitionAvoidance();
 void solution();
 #endif
