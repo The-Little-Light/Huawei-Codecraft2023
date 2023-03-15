@@ -32,6 +32,15 @@ struct workbench {
         while(proType--) s <<= 1;
         rstatus = s | rstatus;
     }
+    // 计算当前已拥有原材料数量
+    int rawMaterNum() {
+        int r = rstatus, cnt = 0;
+        while (r) {
+            if (r & 1) cnt++;
+            r >>= 1;
+        }
+        return cnt;
+    }
 };
 
 struct command { // 汇总当前帧机器人的控制指令

@@ -1,9 +1,10 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-12 22:50:56
- * @LastEditTime: 2023-03-13 09:59:07
- * @LastEditors: Xzh
+ * @LastEditTime: 2023-03-16 02:26:07
+ * @LastEditors: Xzx
  * @Description: 
+ *      基本实现行星运动避免
  ***/
 #include "solution.hpp"
 
@@ -27,14 +28,17 @@ void robot::setSpeed(coordinate dest){
     // Limit the linear speed
     if (absAngleDiff * 2 > PI) {
         minLSpeed = 0;
-        cmd.rotate = sign * min(absAngleDiff*4, PI);   // 调参处
+        cmd.rotate = sign * min(absAngleDiff*4, PI);   
     }
     else if (absAngleDiff * 4 > PI) {
         minLSpeed = 2;
-        cmd.rotate = sign * min(absAngleDiff*3, PI);   // 调参处
+        cmd.rotate = sign * min(absAngleDiff*3, PI);   
     }
     else {
-        cmd.rotate = sign * min(absAngleDiff*2, PI);   // 调参处
+        cmd.rotate = sign * min(absAngleDiff*2, PI);   
     }
-    cmd.forward = min(minLSpeed, 0.1*dist*dist + 4);// 调参处
+    if (absAngleDiff * 7 > PI && dist < 1.2) {
+        cmd.forward = min(minLSpeed, 0.1*dist*dist + 1);
+    }
+    else cmd.forward = min(minLSpeed, 0.1*dist*dist + 5);
 }

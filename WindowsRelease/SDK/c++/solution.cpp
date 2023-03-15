@@ -2,11 +2,12 @@
 
 /******************************
 author:     xiezx
-date:       2023-3-15
+date:       2023-3-16
 describe:   
     1、价值函数加入旋转时间考量
-    2、降低直接把产品送到8、9号工作台的权重，优先合成
-    3、估算任务需要帧长度
+    2、降低直接把产品送到8、9号工作台的权重，优先用于合成
+    3、估算任务需要帧长度，尽量保证在9000帧前完成已分配的任务
+    4、加入收购工作台剩余原材料空格数量对价值的影响，剩余越少空格越重视
 ******************************/
 
 bool cmp (misson& a, misson& b) {
@@ -55,10 +56,17 @@ void misson::countValue(coordinate& rtCo, int proType, vec& lsp) {
     double tt = dd/6 + rr/PI;
     estFrame = tt * 50 + 10;
     double vv = profitAndTime[proType].first;
+    // 考虑剩余原材料格对价值的影响，目标工作台的剩余材料格越少越重视
     if (wb[endIndex].type > 7) {
         vv *= 0.8;
     }
-    v = para1 / dd + para2 * vv;
+    else if (wb[endIndex].type == 7) {
+        vv += 0.5*profitAndTime[wb[endIndex].type].first/(3-wb[endIndex].rawMaterNum());
+    }
+    else if (wb[endIndex].type > 3) {
+        vv += 0.5*profitAndTime[wb[endIndex].type].first/(2-wb[endIndex].rawMaterNum());
+    }
+    v = para1 / tt + para2 * vv;
 } 
 
 void robot::checkDest() {
@@ -104,22 +112,6 @@ void robot::checkTask() {
     task& curTask = taskQueue.front();
     setSpeed(curTask.destCo);
 }
-
-// void motion_test(){
-//     robot& tmp = rt[0];
-//     if(tmp.wb_id = tmp.taskQueue.front().destId) {
-//         while(1){
-//             int next = rand()%K;
-//             if(next != tmp.wb_id) {
-//                 tmp.taskQueue.front().destId = next;
-//                 break;
-//             }
-//         }
-//     }
-//     int next = tmp.taskQueue.front().destId;
-//     tmp.setSpeed(wb[next].location);
-//     cerr<<next<<" "<<tmp.cmd.forward<<" "<<tmp.cmd.rotate<<endl;
-// }
 
 void solution() {
     // 根据已分配任务把工作台信息进行同步
