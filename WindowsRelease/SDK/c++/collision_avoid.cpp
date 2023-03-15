@@ -7,14 +7,18 @@
  *      碰撞避免，分类讨论
  ***/
 #include "solution.hpp"
+// 向量模
+double modulusOfVector(vec& a) {
+    return sqrt(a.x*a.x + a.y*a.y);
+}
 
 // 向量叉积
-double crossProduct(coordinate& a, coordinate& b) {
+double crossProduct(vec& a, vec& b) {
     return a.x * b.y - a.y * b.x;
 }
 
 // 向量点乘
-double dotProduct(coordinate& a, coordinate& b) {
+double dotProduct(vec& a, vec& b) {
     return a.x * b.x + a.y * b.y;
 }
 
@@ -23,13 +27,14 @@ void collitionAvoidance() {
     double colDiss = 2;
     for (int rt1 = 0; rt1 < 4; ++rt1) {
         if (rt[rt1].holdTime > 0) {
-            // if (rt[rt1].leftOrRight) {
-            //     rt[rt1].cmd.rotate = 2.5;
-            // }
-            // else {
-            //     rt[rt1].cmd.rotate = -2.5;
-            // }
-            rt[rt1].cmd.forward = 0.5;
+            if (rt[rt1].leftOrRight) {
+                rt[rt1].cmd.rotate = 2.5;
+            }
+            else {
+                rt[rt1].cmd.rotate = -2.5;
+            }
+            // rt[rt1].cmd.forward = 0.5;
+            rt[rt1].cmd.forward = 6;
             continue;
         }
         for (int rt2 = rt1 + 1; rt2 < 4; ++rt2) {
@@ -43,16 +48,15 @@ void collitionAvoidance() {
                     double cp = crossProduct(lsp, disVec);
                     if (cp < 0) {
                         // 对方在右手边，逆时针旋转
-                        // rt[rt1].cmd.rotate = 2.5;
-                        rt[rt1].cmd.forward = 0.5;
+                        rt[rt1].cmd.rotate = 2.5;
                         rt[rt1].leftOrRight = 1;
                     }
                     else {
                         // 左手边，顺时针旋转
-                        // rt[rt1].cmd.rotate = -2.5;
-                        rt[rt1].cmd.forward = 0.5;
+                        rt[rt1].cmd.rotate = -2.5;
                         rt[rt1].leftOrRight = 0;
                     }
+                    rt[rt1].cmd.forward = 6;
                     rt[rt1].holdTime = 10; // 持续时间帧数
                     break;
                     // cerr << "collision avoidance \n";
