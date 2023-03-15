@@ -88,7 +88,7 @@ struct misson {
     double estFrame = 0; // 估计任务消耗帧数
     
     double para1 = 950000;
-    double para2 = 6;
+    double para2 = 7;
     misson(int s, int e, int p) {
         startIndex = s;
         endIndex = e;
