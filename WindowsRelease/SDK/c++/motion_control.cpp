@@ -25,20 +25,23 @@ void robot::setSpeed(coordinate dest){
     if (angleDiff > 0) sign = 1.0;
     else if (angleDiff < 0) sign = -1.0;
     absAngleDiff = sign*angleDiff;
-    // Limit the linear speed
-    if (absAngleDiff * 2 > PI) {
-        minLSpeed = 0;
-        cmd.rotate = sign * min(absAngleDiff*4, PI);   
-    }
-    else if (absAngleDiff * 4 > PI) {
-        minLSpeed = 2;
-        cmd.rotate = sign * min(absAngleDiff*3, PI);   
+    // Limit the angular velocity
+    if (absAngleDiff * 15 > PI) {
+        cmd.rotate = sign * PI;
     }
     else {
-        cmd.rotate = sign * min(absAngleDiff*2, PI);   
+        cmd.rotate = sign * 15 * absAngleDiff;
     }
-    if (absAngleDiff * 7 > PI && dist < 1.2) {
-        cmd.forward = min(minLSpeed, 0.1*dist*dist + 1);
+    // Limit the velocity according to the angle and distance 
+    if (absAngleDiff * 2 > PI) {
+        minLSpeed = 2 * cos(absAngleDiff);
     }
-    else cmd.forward = min(minLSpeed, 0.1*dist*dist + 5);
+    else {
+        minLSpeed = 6 * cos(absAngleDiff); 
+    }
+    cmd.forward = minLSpeed;
+    // if (absAngleDiff * 7 > PI && dist < 1.2) {
+    //     cmd.forward = min(minLSpeed, 0.1*dist*dist + 1);
+    // }
+    // else cmd.forward = min(minLSpeed, 0.1*dist*dist + 5);
 }
