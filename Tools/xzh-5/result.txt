@@ -1,0 +1,8 @@
+{"status":"Successful","score":893308}
+{"status":"Successful","score":694925}
+{"status":"Successful","score":417812}
+{"status":"Successful","score":672774}
+{"status":"Successful","score":234155}
+Total: 2912974
+Average: 582594.8000
+Wrong:

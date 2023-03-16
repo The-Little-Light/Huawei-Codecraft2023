@@ -1,0 +1,2 @@
+[INFO]D:\Project\CodeCraft2023\Robot\Game.cpp:53|Game::Init|frame[1]|Loaded workbench : 18
+[INFO]D:\Project\CodeCraft2023\Robot\Game.cpp:528|Game::GameOver|frame[9001]|player skipped frames:2
