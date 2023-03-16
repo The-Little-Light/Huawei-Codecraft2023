@@ -4,6 +4,7 @@
 *.exe
 *.json
 *.zip
+result.txt
 
 #忽略test.cpp
 test.cpp
@@ -13,3 +14,4 @@ mergeMain.sh
 build/
 maps/
 replay/
+result/
