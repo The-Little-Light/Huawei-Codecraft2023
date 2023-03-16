@@ -137,6 +137,7 @@ extern double dis(coordinate& c1, coordinate& c2);
 extern double crossProduct(vec& a, vec& b);
 extern double dotProduct(vec& a, vec& b);
 extern double modulusOfVector(vec& a);
+extern double cntAngle(vec& a, vec& b);
 void collitionAvoidance();
 void solution();
 #endif

@@ -22,11 +22,6 @@ double dotProduct(vec& a, vec& b) {
     return a.x * b.x + a.y * b.y;
 }
 
-// 向量夹角
-double angle(vec& a, vec& b) {
-    return acos(dotProduct(a, b) / (dis(a, b) * dis(a, b)));
-}
-
 void collitionAvoidance() {
     // 检测机器人之间的运动向量，估计碰撞可能
     double colDiss = 3;

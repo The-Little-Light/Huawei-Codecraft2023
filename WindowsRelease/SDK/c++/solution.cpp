@@ -40,7 +40,7 @@ void findMission(vector<misson>& msNode, coordinate& rtCo, vec& lsp) {
 }
 
 // 计算两个向量的夹角
-double cntAbsAngle(vec& a, vec& b){
+double cntAngle(vec& a, vec& b){
     double angleDiff = acos(dotProduct(a, b) / (modulusOfVector(a)*modulusOfVector(b)));
     return (angleDiff);
 }
@@ -52,7 +52,7 @@ void misson::countValue(coordinate& rtCo, int proType, vec& lsp) {
     double dd = dis(rtCo, s) + dis(s, e);   // 机器人到起点再到终点的距离
     vec r2s(s.x - rtCo.x, s.y - rtCo.y);    // 机器人到起点向量
     vec s2e(e.x - s.x, e.y - s.y);          // 起点到终点的向量
-    double rr = cntAbsAngle(lsp, r2s) + cntAbsAngle(r2s, s2e); // 任务所需转动角度和
+    double rr = cntAngle(lsp, r2s) + cntAngle(r2s, s2e); // 任务所需转动角度和
     double tt = dd/6 + rr/PI;
     estFrame = tt * 50 + 50;
     double vv = profitAndTime[proType].first;
