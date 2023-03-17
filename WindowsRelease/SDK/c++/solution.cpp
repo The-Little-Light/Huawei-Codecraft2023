@@ -70,13 +70,22 @@ void misson::countValue(coordinate& rtCo, int proType, vec& lsp) {
 } 
 
 void robot::checkDest() {
-    if (!taskQueue.empty()) {
-        task& curTask = taskQueue.front();
-        if (wb_id == curTask.destId) {
-            // 到达当前工作目的地，交付工作
-            cmd.buy = curTask.buy;
-            cmd.sell = curTask.sell;
-            taskQueue.pop();
+    if (haveTemDest) { 
+        // 检查是否到达临时目的地附近
+        if (dis(temDest, location) < 0.5) {
+            // 视为到达
+            haveTemDest = false;
+        }
+    }
+    else {
+        if (!taskQueue.empty()) {
+            task& curTask = taskQueue.front();
+            if (wb_id == curTask.destId) {
+                // 到达当前工作目的地，交付工作
+                cmd.buy = curTask.buy;
+                cmd.sell = curTask.sell;
+                taskQueue.pop();
+            }
         }
     }
 }
@@ -85,12 +94,7 @@ void robot::checkTask() {
     if (taskQueue.empty()) {
         // 分配新任务
         vector<misson> msNode; // 任务节点
-        vec lspToward(lsp.x, lsp.y);
-        if (abs(lspToward.x) < 0.00001 && abs(lspToward.y) < 0.00001) {
-            lspToward.x = 5*cos(toward);
-            lspToward.y = 5*sin(toward);
-        }
-        findMission(msNode, location, lspToward);
+        findMission(msNode, location, lsp);
         bool success = false;
         for (int i = 0; i < msNode.size(); ++i) {
             misson selected = msNode[i];
@@ -108,14 +112,28 @@ void robot::checkTask() {
         }
         if (!success) return;
     }
-    // 执行当前任务，前往目的地
-    task& curTask = taskQueue.front();
-    setSpeed(curTask.destCo);
+    if (haveTemDest) {
+        // 前往临时目的地
+        setSpeed(temDest);
+    }
+    else {
+        // 执行当前任务，前往目的地
+        task& curTask = taskQueue.front();
+        setSpeed(curTask.destCo);
+    }
+}
+
+void robot::checkSpeed() {
+    if (abs(lsp.x) < 0.01 && abs(lsp.y) < 0.01) {
+        lsp.x += 1*cos(toward);
+        lsp.y += 1*sin(toward);
+    }
 }
 
 void solution() {
     // 根据已分配任务把工作台信息进行同步
     for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
+        rt[rtIdx].checkSpeed(); // 保证速度非0
         if (rt[rtIdx].taskQueue.size() == 2) {
             misson& tmp = rt[rtIdx].curMisson;
             wb[tmp.startIndex].pstatus = 0;
@@ -135,5 +153,6 @@ void solution() {
     }
     // 碰撞避免
     collitionAvoidance();
+    // ori_collitionAvoidance(); 
     return;
 }
