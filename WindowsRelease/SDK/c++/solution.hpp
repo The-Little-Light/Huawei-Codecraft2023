@@ -115,11 +115,16 @@ struct robot {
     misson curMisson;
     void checkDest();
     void checkTask();
+    void checkSpeed();
 
     // 碰撞避免持续时间
     int holdTime = 0;
     bool leftOrRight = 0; // left:0, right:1
     vec avoidance;
+    // 势能场临时中间点碰撞避免所需变量
+    coordinate temDest;
+    bool haveTemDest = 0;
+    void setTemporaryDest(coordinate& td); // 设置临时目的地
 };
 
 extern int frameID;                   // 当前帧
@@ -137,6 +142,8 @@ extern double dis(coordinate& c1, coordinate& c2);
 extern double crossProduct(vec& a, vec& b);
 extern double dotProduct(vec& a, vec& b);
 extern double modulusOfVector(vec& a);
+extern double cntAngle(vec& a, vec& b);
 void collitionAvoidance();
+void ori_collitionAvoidance();
 void solution();
 #endif
