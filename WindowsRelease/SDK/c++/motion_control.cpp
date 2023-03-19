@@ -1,10 +1,10 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-12 22:50:56
- * @LastEditTime: 2023-03-16 02:26:07
- * @LastEditors: Xzx
+ * @LastEditTime: 2023-03-17 01:10
+ * @LastEditors: Zym
  * @Description: 
- *      基本实现行星运动避免
+ *      优化路径规划，并基本保证行星运动避免
  ***/
 #include "solution.hpp"
 
@@ -32,7 +32,7 @@ void robot::setSpeed(coordinate dest){
     else {
         cmd.rotate = sign * 15 * absAngleDiff;
     }
-    // Limit the velocity according to the angle and distance 
+    // Limit the velocity according to the angle and distance
     if (absAngleDiff * 2 > PI) {
         minLSpeed = 2 * cos(absAngleDiff);
     }
