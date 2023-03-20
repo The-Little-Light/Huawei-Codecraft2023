@@ -26,7 +26,7 @@ double dotProduct(vec& a, vec& b) {
 // 计算势能分布 a 为角度，lsp 为线速度向量
 double cntR(double a, vec& lsp, double asp) {
     double lm = modulusOfVector(lsp);
-    a -= 0.2 * asp;         // 角度偏置
+    // a -= 0.0002 * asp;         // 角度偏置
     double e_up = -1 * a * a * lm * lm / 36;
     return exp(e_up) * lm / 6;
 }
@@ -76,9 +76,27 @@ void collitionAvoidance() {
             // 需要进行碰撞避免，进行让路者选举
             double lm1 = modulusOfVector(lsp);
             double lm2 = modulusOfVector(rt[maxPeComponent.second].lsp);
-            // if (lm2 <= 1.2 && lm1 > lm2) {
+            // if (lm2 <= 1 && lm1 > lm2) {
             //     // 当本方速度高于对方且对方速度小于1.2时，本方避让
-
+            //     double dis_para = 0.2;
+            //     coordinate& otLoca = rt[maxPeComponent.second].location;
+            //     vec otVec; otVec.set(rLoca.x-otLoca.x, rLoca.y-otLoca.y);
+            //     vec l_lsp(otVec.y, -otVec.x); 
+            //     vec r_lsp(-otVec.y, otVec.x); 
+            //     coordinate aLeft(otLoca.x + dis_para * l_lsp.x, otLoca.y + dis_para * l_lsp.y);
+            //     coordinate aRight(otLoca.x + dis_para * r_lsp.x, otLoca.y + dis_para * r_lsp.y);
+            //     double aLeftPe = 0, aRightPe = 0;
+            //     for (int otherRt = 0; otherRt < ROBOT_NUM; ++otherRt) {
+            //         if (curRt == otherRt) continue;
+            //         aLeftPe += cntPontEnergy(otherRt, aLeft);
+            //         aRightPe += cntPontEnergy(otherRt, aRight);
+            //     }
+            //     if (aLeftPe <= aRightPe) {
+            //         rt[curRt].setTemporaryDest(aLeft);
+            //     }
+            //     else {
+            //         rt[curRt].setTemporaryDest(aRight);
+            //     }
             // }
             if (lm1 <= lm2) {
                 // fprintf(stderr, "cur speed:%.2f\n",lm1);
