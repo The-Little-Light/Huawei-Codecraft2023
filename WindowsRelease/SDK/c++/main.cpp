@@ -10,16 +10,21 @@ using namespace std;
 
 int frameID;
 int K;                         // 工作台数
-robot rt[ROBOT_SIZE];          // 机器人
+robot rt[ROBOT_NUM];           // 机器人
 workbench wb[WORKBENCH_SIZE];  // 工作台
 char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
+int collisionNum[ROBOT_NUM];   // 碰撞次数
+int buyNum[8][ROBOT_NUM];      // 物品的购买次数
+int sellNum[8][ROBOT_NUM];     // 物品的出售次数
+ofstream fout;                 // 与日志文件关联的输出流
 
 map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 
 pair<int,int> profitAndTime[8];
 
 void init() {
-    for (int i = 0; i < 4; ++i) rt[i].rtIdx = i+1;
+    fout.open("log.txt", ios_base::app);
+    for (int i = 0; i < ROBOT_NUM; ++i) rt[i].rtIdx = i+1;
     profitAndTime[1] = make_pair(6000-3000, 50);
     profitAndTime[2] = make_pair(7600-4400, 50);
     profitAndTime[3] = make_pair(9200-5800, 50);
@@ -84,7 +89,8 @@ void readInfo() {
             &wb[i].pstatus
         ); wb[i].location.set(x, y);
     }
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < ROBOT_NUM; ++i) {
+        rt[i].pcvc = rt[i].cvc;
         scanf("%d %d %lf %lf %lf %lf %lf",
             &rt[i].wb_id,
             &rt[i].pd_id,
@@ -97,6 +103,10 @@ void readInfo() {
             &rt[i].toward,
             &x, &y // location
         ); rt[i].location.set(x, y);
+        if ((rt[i].pcvc - rt[i].cvc >= 0.001) && (rt[i].cvc > 0.79)) {
+            // fout << frameID << "(" << "robot" << i+1 << ")" << ": " << rt[i].pcvc << " -> " << rt[i].cvc << endl;
+            ++collisionNum[i];
+        }
     }
     getchar();
     fgets(line, sizeof line, stdin); // receive OK
@@ -127,11 +137,26 @@ int main() {
         /**** CORE ****/
         solution();
         /**************/
-        for(int robotId = 0; robotId < 4; robotId++){
+        for(int robotId = 0; robotId < ROBOT_NUM; robotId++){
             printRobotCommand(robotId);
         }
         printf("OK\n");
         fflush(stdout);
     }
+    
+    fout << "******************************LOG INFORMATION START******************************";
+    fout << endl << setw(15) << "ROBOT:";
+    for (int i = 1; i <= ROBOT_NUM; ++i)    fout << setw(8) << i;
+    fout << endl << setw(15) << "COLLOSION:";
+    for (int i = 0; i < ROBOT_NUM; ++i)    fout << setw(8) << collisionNum[i];
+    for (int i = 1; i <= 7; ++i) {
+        fout << endl << setw(10) << i << "_BUY:";
+        for (int j = 0; j < ROBOT_NUM; ++j)    fout << setw(8) << buyNum[i][j];
+        fout << endl << setw(9) << i << "_SELL:";
+        for (int j = 0; j < ROBOT_NUM; ++j)    fout << setw(8) << sellNum[i][j];
+    }
+    fout << endl << "******************************LOG INFORMATION END*******************************" << endl << endl << endl;
+    fout.close();
+
     return 0;
 }

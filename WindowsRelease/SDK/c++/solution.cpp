@@ -83,7 +83,9 @@ void robot::checkDest() {
             if (wb_id == curTask.destId) {
                 // 到达当前工作目的地，交付工作
                 cmd.buy = curTask.buy;
+                if (cmd.buy) ++buyNum[curMission.proType][rtIdx-1];
                 cmd.sell = curTask.sell;
+                if (cmd.sell) ++sellNum[curMission.proType][rtIdx-1];
                 taskQueue.pop();
             }
         }
@@ -101,11 +103,11 @@ void robot::checkTask() {
             // 预计任务能在第9000帧之前完成才接单
             // cerr << "robot" << rtIdx << ": " << frameID << "   " << selected.estFrame + frameID << endl;
             if (selected.estFrame + frameID < 9000) {
-                curMisson = selected;
+                curMission = selected;
                 taskQueue.push(task(wb[selected.startIndex].location ,selected.startIndex, 1, 0));
                 taskQueue.push(task(wb[selected.endIndex].location ,selected.endIndex, 0, 1));
-                wb[curMisson.startIndex].pstatus = 0;
-                wb[curMisson.endIndex].setProType(curMisson.proType);
+                wb[curMission.startIndex].pstatus = 0;
+                wb[curMission.endIndex].setProType(curMission.proType);
                 success = true;
                 break;
             }
@@ -132,20 +134,20 @@ void robot::checkSpeed() {
 
 void solution() {
     // 根据已分配任务把工作台信息进行同步
-    for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
+    for (int rtIdx = 0; rtIdx < ROBOT_NUM; ++rtIdx) {
         rt[rtIdx].checkSpeed(); // 保证速度非0
         if (rt[rtIdx].taskQueue.size() == 2) {
-            misson& tmp = rt[rtIdx].curMisson;
+            misson& tmp = rt[rtIdx].curMission;
             wb[tmp.startIndex].pstatus = 0;
             wb[tmp.endIndex].setProType(tmp.proType);
         }
         else if (rt[rtIdx].taskQueue.size() == 1) {
-            misson& tmp = rt[rtIdx].curMisson;
+            misson& tmp = rt[rtIdx].curMission;
             wb[tmp.endIndex].setProType(tmp.proType);
         }
     }
     // 指令规划
-    for (int rtIdx = 0; rtIdx < 4; ++rtIdx) {
+    for (int rtIdx = 0; rtIdx < ROBOT_NUM; ++rtIdx) {
         if (rt[rtIdx].holdTime) --rt[rtIdx].holdTime;
         rt[rtIdx].cmd.clean(); // 清除之前指令设置
         rt[rtIdx].checkDest(); // 检查是否到达目的地
