@@ -1,10 +1,11 @@
 /*** 
  * @Author: Xzx
  * @Date: 2023-03-14
- * @LastEditTime: 2023-03-17 01:17:15
+ * @LastEditTime: 2023-03-19 09:39:11
  * @LastEditors: Xzx
  * @Description: 
- *      引入势能场的概念，把碰撞处理从紧急避让变成引入势能较低点作为临时目的地
+ *      引入势能场的概念，把碰撞处理从紧急避让变成引入势能较低点作为临时目的地（3-17）
+ *      对势能场分布进行修正，加入角度考量（3-19）
  ***/
 #include "solution.hpp"
 // 向量模
@@ -23,8 +24,9 @@ double dotProduct(vec& a, vec& b) {
 }
 
 // 计算势能分布 a 为角度，lsp 为线速度向量
-double cntR(double a, vec& lsp) {
+double cntR(double a, vec& lsp, double asp) {
     double lm = modulusOfVector(lsp);
+    a -= 0.2 * asp;         // 角度偏置
     double e_up = -1 * a * a * lm * lm / 36;
     return exp(e_up) * lm / 6;
 }
@@ -34,7 +36,11 @@ double cntPontEnergy(int rtIdx, coordinate& d) {
     robot& rbt = rt[rtIdx];
     vec r2d(d.x - rbt.location.x, d.y - rbt.location.y); 
     double angle = cntAngle(rbt.lsp, r2d);
-    return 1.2 * cntR(angle, rbt.lsp) / dis(d, rbt.location);
+    // 根据相对机器人左正右负设定角度符号
+    if (crossProduct(rbt.lsp, r2d) > 0) {
+        angle = -angle;
+    }
+    return 1.2 * cntR(angle, rbt.lsp, rbt.asp) / dis(d, rbt.location);
 }
 
 // 设置临时目的地
@@ -70,14 +76,19 @@ void collitionAvoidance() {
             // 需要进行碰撞避免，进行让路者选举
             double lm1 = modulusOfVector(lsp);
             double lm2 = modulusOfVector(rt[maxPeComponent.second].lsp);
+            // if (lm2 <= 1.2 && lm1 > lm2) {
+            //     // 当本方速度高于对方且对方速度小于1.2时，本方避让
+
+            // }
             if (lm1 <= lm2) {
                 // fprintf(stderr, "cur speed:%.2f\n",lm1);
                 // 两个避让候选点根据势能选择低势能者为临时目的地
                 double rot = PI/6;
+                double dis_para = 0.2;
                 vec l_lsp(lsp.x * cos(rot) + lsp.y * sin(rot), -lsp.x * sin(rot) + lsp.y * cos(rot));     // 逆时针旋转60°
                 vec r_lsp(lsp.x * cos(-rot) + lsp.y * sin(-rot), -lsp.x * sin(-rot) + lsp.y * cos(-rot)); // 顺时针旋转60°
-                coordinate aLeft(rLoca.x + 0.2 * l_lsp.x, rLoca.y + 0.2 * l_lsp.y);
-                coordinate aRight(rLoca.x + 0.2 * r_lsp.x, rLoca.y + 0.2 * r_lsp.y);
+                coordinate aLeft(rLoca.x + dis_para * l_lsp.x, rLoca.y + dis_para * l_lsp.y);
+                coordinate aRight(rLoca.x + dis_para * r_lsp.x, rLoca.y + dis_para * r_lsp.y);
                 double aLeftPe = 0, aRightPe = 0;
                 for (int otherRt = 0; otherRt < ROBOT_NUM; ++otherRt) {
                     if (curRt == otherRt) continue;
