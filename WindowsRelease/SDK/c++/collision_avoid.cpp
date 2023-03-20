@@ -47,7 +47,7 @@ void robot::setTemporaryDest(coordinate& td) {
 
 void collitionAvoidance() {
     double u = 0.5; // 拥塞阈值
-    for (int curRt = 0; curRt < 4; ++curRt) {
+    for (int curRt = 0; curRt < ROBOT_NUM; ++curRt) {
         // if (rt[curRt].haveTemDest) continue;
         // 枚举每个机器人，计算其碰撞势能检测点受到的势能
         double pe = 0.0;                        // potentail energy
@@ -56,7 +56,7 @@ void collitionAvoidance() {
         coordinate& rLoca = rt[curRt].location;
         vec& lsp = rt[curRt].lsp;
         detectPoint.set(rLoca.x + 0.4 * lsp.x, rLoca.y + 0.4 * lsp.y);
-        for (int otherRt = 0; otherRt < 4; ++otherRt) {
+        for (int otherRt = 0; otherRt < ROBOT_NUM; ++otherRt) {
             if (curRt == otherRt) continue;
             double peComponent = cntPontEnergy(otherRt, detectPoint);
             pe += peComponent;
@@ -79,7 +79,7 @@ void collitionAvoidance() {
                 coordinate aLeft(rLoca.x + 0.2 * l_lsp.x, rLoca.y + 0.2 * l_lsp.y);
                 coordinate aRight(rLoca.x + 0.2 * r_lsp.x, rLoca.y + 0.2 * r_lsp.y);
                 double aLeftPe = 0, aRightPe = 0;
-                for (int otherRt = 0; otherRt < 4; ++otherRt) {
+                for (int otherRt = 0; otherRt < ROBOT_NUM; ++otherRt) {
                     if (curRt == otherRt) continue;
                     aLeftPe += cntPontEnergy(otherRt, aLeft);
                     aRightPe += cntPontEnergy(otherRt, aRight);
@@ -100,11 +100,11 @@ void collitionAvoidance() {
 void ori_collitionAvoidance() {
     // 检测机器人之间的运动向量，估计碰撞可能
     double colDiss = 3;
-    for (int rt1 = 0; rt1 < 4; ++rt1) {
+    for (int rt1 = 0; rt1 < ROBOT_NUM; ++rt1) {
         
         // if (rt[rt1].holdTime == 0)
         
-        for (int rt2 = 0; rt2 < 4; ++rt2) {
+        for (int rt2 = 0; rt2 < ROBOT_NUM; ++rt2) {
             if (rt1 == rt2) continue;
             coordinate& a = rt[rt1].location;
             coordinate& b = rt[rt2].location;
