@@ -1,8 +1,8 @@
 $ROOT='C:/Huawei-Developer-Contest/WindowsRelease'
-cd $ROOT/SDK/c++/build
-rm -r -fo *
+rm -r -fo $ROOT/SDK/c++/build/*
 rm -r -fo $ROOT/replay/*
 rm -fo $ROOT/SDK/c++/log.txt
+cd $ROOT/SDK/c++/build
 cmake .. -G "MinGW Makefiles"
 mingw32-make -j
 cd $ROOT/SDK/c++

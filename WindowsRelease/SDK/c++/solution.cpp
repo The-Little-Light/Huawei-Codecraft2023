@@ -82,10 +82,8 @@ void robot::checkDest() {
             task& curTask = taskQueue.front();
             if (wb_id == curTask.destId) {
                 // 到达当前工作目的地，交付工作
-                cmd.buy = curTask.buy;
-                if (cmd.buy) ++buyNum[curMission.proType][rtIdx-1];
-                cmd.sell = curTask.sell;
-                if (cmd.sell) ++sellNum[curMission.proType][rtIdx-1];
+                cmd.buy = curTask.buy;                
+                cmd.sell = curTask.sell;                
                 taskQueue.pop();
             }
         }
@@ -130,6 +128,22 @@ void robot::checkSpeed() {
         lsp.x += 1*cos(toward);
         lsp.y += 1*sin(toward);
     }
+}
+
+// 统计碰撞次数
+void robot::collisionCount() {    
+    if ((pcvc - cvc >= 0.001) && (cvc > 0.79)) {
+        // fout << frameID << "(" << "robot" << rtIdx << ")" << ": " << pcvc << " -> " << cvc << endl;
+        ++collisionNum;
+    }
+}
+
+// 统计购买与出售次数
+void robot::buysellCount() {
+    if (!haveTemDest && !taskQueue.empty() && wb_id == taskQueue.front().destId) {
+        if (taskQueue.front().buy)   ++buyNum[curMission.proType];
+        if (taskQueue.front().sell)  ++sellNum[curMission.proType];
+    } 
 }
 
 void solution() {

@@ -1,6 +1,7 @@
 #ifndef SOLUTION_HPP
 #define SOLUTION_HPP
 #include <bits/stdc++.h>
+#include "util.hpp"
 #define MAP_SIZE 100
 #define WORKBENCH_SIZE 50
 #define ROBOT_SIZE 50
@@ -111,6 +112,9 @@ struct robot {
     double toward; // 朝向，弧度制
     coordinate location;
     command cmd;  // 当前帧要发布的控制指令
+    int collisionNum;  // 碰撞次数
+    int buyNum[8];     // 物品的购买次数
+    int sellNum[8];    // 物品的出售次数
     void setSpeed(coordinate dest); // 负责从当前位置移动到目的地的线速度和角速度指令
 
     queue<task> taskQueue; // 任务队列
@@ -127,6 +131,10 @@ struct robot {
     coordinate temDest;
     bool haveTemDest = 0;
     void setTemporaryDest(coordinate& td); // 设置临时目的地
+
+    // 用于统计
+    void collisionCount();
+    void buysellCount();
 };
 
 extern int frameID;                   // 当前帧
@@ -134,10 +142,7 @@ extern int K;                         // 工作台数
 extern robot rt[ROBOT_NUM];           // 机器人
 extern workbench wb[WORKBENCH_SIZE];  // 工作台
 extern char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
-extern int collisionNum[ROBOT_NUM];   // 碰撞次数
-extern int buyNum[8][ROBOT_NUM];      // 物品的购买次数
-extern int sellNum[8][ROBOT_NUM];     // 物品的出售次数
-extern double PI;                     // 圆周率
+extern const double PI;               // 圆周率
 extern ofstream fout;                 // 与日志文件关联的输出流
 
 extern map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
