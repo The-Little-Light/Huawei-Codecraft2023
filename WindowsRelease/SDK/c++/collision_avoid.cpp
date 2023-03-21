@@ -1,8 +1,8 @@
 /*** 
  * @Author: Xzx
  * @Date: 2023-03-14
- * @LastEditTime: 2023-03-19 09:39:11
- * @LastEditors: Xzx
+ * @LastEditTime: 2023-03-20 00:22:44
+ * @LastEditors: Xzh
  * @Description: 
  *      引入势能场的概念，把碰撞处理从紧急避让变成引入势能较低点作为临时目的地（3-17）
  *      对势能场分布进行修正，加入角度考量（3-19）

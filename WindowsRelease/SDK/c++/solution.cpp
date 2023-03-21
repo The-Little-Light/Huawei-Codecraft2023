@@ -1,13 +1,14 @@
 #include "solution.hpp"
 
 /******************************
-author:     xiezx
-date:       2023-3-16
+author:     xiezh
+date:       2023-3-20
 describe:   
     1、价值函数加入旋转时间考量
     2、降低直接把产品送到8、9号工作台的权重，优先用于合成
     3、估算任务需要帧长度，尽量保证在9000帧前完成已分配的任务
     4、加入收购工作台剩余原材料空格数量对价值的影响，剩余越少空格越重视
+    5、引入最小费用最大流对进行全局任务规划，优化任务分配
 ******************************/
 
 bool cmp (misson& a, misson& b) {
@@ -127,13 +128,16 @@ void robot::checkTask() {
 
 void robot::checkSpeed() {
     // 速度过低时用朝向来为其赋一个明确速度
-    if (abs(lsp.x) < 0.01 && abs(lsp.y) < 0.01) {
+    if (fabs(lsp.x) < 0.01 && fabs(lsp.y) < 0.01) {
         lsp.x += 1*cos(toward);
         lsp.y += 1*sin(toward);
     }
 }
 
-void solution() {
+
+
+
+void ori_solution() {
     // 根据已分配任务把工作台信息进行同步
     for (int rtIdx = 0; rtIdx < ROBOT_NUM; ++rtIdx) {
         rt[rtIdx].checkSpeed(); // 保证速度非0

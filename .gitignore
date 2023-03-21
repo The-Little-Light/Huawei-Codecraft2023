@@ -4,6 +4,7 @@
 *.exe
 *.json
 *.zip
+result.txt
 
 #忽略test.cpp
 test.cpp
@@ -14,3 +15,4 @@ log.txt
 build/
 maps/
 replay/
+result/
