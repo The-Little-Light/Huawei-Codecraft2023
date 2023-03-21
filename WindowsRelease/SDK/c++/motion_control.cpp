@@ -10,8 +10,6 @@
  ***/
 #include "solution.hpp"
 
-const double PI = acos(-1);
-
 void robot::setSpeed(coordinate dest) {
     // 参数
     double dx = dest.x - location.x;

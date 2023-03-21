@@ -80,7 +80,7 @@ then
         for file in ./maps/*
         do
             suffix=`basename $file | cut -d . -f 1`
-            ./bin/robot -f -s $RANDOM -r $target"replay/$suffix.rep" -m $file -c $target "main.exe" 1>>${target}"result.txt" 2>${target}"result/"${suffix}".txt"
+            ./bin/robot -d -s $RANDOM -r $target"replay/$suffix.rep" -m $file -c $target "main.exe" 1>>${target}"result.txt" 2>${target}"result/"${suffix}".txt"
             tmp=`tail -n 1 ${target}result.txt`
             t1=`echo $tmp | jq .status`
             if [ "$t1" = '"Successful"' ]
