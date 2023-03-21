@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-21 10:09:20
+ * @LastEditTime: 2023-03-21 10:13:52
  * @LastEditors: Xzh
  * @Description: 
  */
@@ -87,6 +87,7 @@ double mcmf::countValue(int proType,int startIndex,int endIndex) {
     else if (wb[endIndex].type > 3) {
         vv += 0.35*profitAndTime[wb[endIndex].type].first/(2-wb[endIndex].rawMaterNum());
     }
+    //TODO related about tt and vv
     return  - ( para2 * vv) + inf;
 }
 
@@ -111,6 +112,7 @@ double mcmf::countSellValue(int proType,int rtIdx,int endIndex){
     else if (wb[endIndex].type > 3) {
         vv += 0.35*profitAndTime[wb[endIndex].type].first/(2-wb[endIndex].rawMaterNum());
     }
+    //TODO related about tt and vv
     return - (para2 * vv) + inf;
 }
 
