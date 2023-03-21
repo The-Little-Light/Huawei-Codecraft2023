@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-21 10:13:52
+ * @LastEditTime: 2023-03-21 21:27:39
  * @LastEditors: Xzh
  * @Description: 
  */
@@ -46,21 +46,47 @@ void mcmf::init(){
         }
     }
 
-    produce2sell[1] = set<int> {4,5,9};
-    produce2sell[2] = set<int> {4,6,9};
-    produce2sell[3] = set<int> {5,6,9};
-    produce2sell[4] = set<int> {7,9};
-    produce2sell[5] = set<int> {7,9};
-    produce2sell[6] = set<int> {7,9};
-    produce2sell[7] = set<int> {8,9};
+    for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
+        switch (wb[wbIdx].type) {
+        case 4:
+            produce2sell[1].insert(workbenchProductId[wbIdx][0]);
+            produce2sell[2].insert(workbenchProductId[wbIdx][1]);
+            break;
+        case 5:
+            produce2sell[1].insert(workbenchProductId[wbIdx][0]);
+            produce2sell[3].insert(workbenchProductId[wbIdx][1]);
+            break;
+        case 6:
+            produce2sell[2].insert(workbenchProductId[wbIdx][0]);
+            produce2sell[3].insert(workbenchProductId[wbIdx][1]);
+            break;
+        case 7:
+            produce2sell[4].insert(workbenchProductId[wbIdx][0]);
+            produce2sell[5].insert(workbenchProductId[wbIdx][1]);
+            produce2sell[6].insert(workbenchProductId[wbIdx][2]);
+            break;
+        case 8:
+            produce2sell[7].insert(workbenchProductId[wbIdx][0]);
+            break;
+        case 9:
+            for (int i = 1; i <= 7; ++i) {
+                produce2sell[i].insert(workbenchProductId[wbIdx][0]);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+
 
     // 初始化空闲产品节点池
+    if (cnt&1) getNode();
     for (; curSize < poolSize; curSize++) {
-        if (cnt&1) getNode();
         int indexSize = index.size();
         pool[curSize] = getNode();
-
         int codNode = getNode();
+
         for (int i = 0; i < N; i++) addEdge(robotId[i],pool[curSize],0,0);
         addEdge(pool[curSize],codNode,0,1);
         for (int i = 0; i < indexSize; i++) addEdge(codNode,index[i],0,0);
@@ -130,7 +156,7 @@ double mcmf::countBuyValue(int proType,int rtIdx,int endIndex) {
 
 
 void mcmf::allocateNode(int wbIdx){
-    if (!(~workbenchId[wbIdx])) {
+    if (workbenchId[wbIdx] == -1) {
         workbenchId[wbIdx] = pool[--curSize];
         int id = workbenchId[wbIdx],type = wb[wbIdx].type;
         ProductId2Workbench[id] = wbIdx;
@@ -147,9 +173,8 @@ void mcmf::allocateNode(int wbIdx){
 
         for (int index = 1,size = G[id].size(); index < size; index++) {
             edge &tmp = G[id][index];
-            int towbIdx = ProductId2Workbench[tmp.to],toType = wb[towbIdx].type;
-            if (produce2sell[type].count(toType)) {
-
+            int towbIdx = ProductId2Workbench[tmp.to];
+            if (produce2sell[type].count(tmp.to)) {
                 tmp.cap = 1, G[tmp.to][tmp.rev].cap = 0;
                 tmp.cost = countValue(type,wbIdx,towbIdx);
                 G[tmp.to][tmp.rev].cost = -tmp.cost;
@@ -196,6 +221,7 @@ int mcmf::solve() {
         return -1;
     }
     bufCur = 0;
+    flow = 0;
     while(spfa() > 0){
         int newflow = inf,index = 0;
         for(int x = T; x != S; x = pre[x])  newflow = min(newflow,G[pre[x]][pe[x]].cap);
@@ -205,9 +231,55 @@ int mcmf::solve() {
             ed.cap -= newflow;
             G[ed.to][ed.rev].cap += newflow;
         }
+        flow += newflow;
         ++bufCur;
     }
     return 1;
+}
+
+void mcmf::showNodeEdge(int id, int condition) {
+    if (condition) {
+        fprintf(stderr,"\n");
+        for (int i = 0,size = G[id].size(); i < size; i++) {
+            edge&ed = G[id][i];
+            if (G[ed.to][ed.rev].cap || 1) {
+                fprintf(stderr," %d %d %d -------> %d %d\n",id,i,ed.cap,ed.to,G[ed.to][ed.rev].cap);
+            }
+        }
+        fprintf(stderr,"\n");
+    }
+}
+
+void mcmf::showFlow(int condition,int detailed) {
+    if (condition) {
+        fprintf(stderr,"\n");
+        for (int i = 0; i < bufCur; i++){
+            int index = 0,pe,pv;
+            fprintf(stderr,"%d ",T);
+            do {
+                pv = stateBuf[i][index][0],pe = stateBuf[i][index][1];
+                ++index;
+                fprintf(stderr,"<------ %d ",pv);
+            }while(pv != S);
+            fprintf(stderr,"\n");
+        }
+        fprintf(stderr,"\n");
+        if (detailed) {
+            fprintf(stderr,"\n");
+            for (int i = 0; i < bufCur; i++){
+                int index = 0,pe,pv;
+                do {
+                    pv = stateBuf[i][index][0],pe = stateBuf[i][index][1];
+                    edge &ed = G[pv][pe];
+                    fprintf(stderr,"%d %d -----> %d %d\n",pv,ed.cap,ed.to,G[ed.to][ed.rev].cap);
+                    ++index;
+                }while(pv != S);
+                fprintf(stderr,"\n");
+            }
+            fprintf(stderr,"\n");
+        }
+    }
+
 }
 
 void mcmf::resetCap(){
@@ -249,8 +321,9 @@ void mcmf::adjustEdge(int rtIdx){
         edge&ed = G[id][i];
         if (ed.to != nodeId) {
             ed.cost = countBuyValue(type,rtIdx,ProductId2Workbench[ed.to]);
+            G[ed.to][ed.rev].cost = -ed.cost;
             // if (nodeId < 0) ed.cap = 1,G[tmp.to][tmp.rev].cap = 0;
-        }
+        } else ed.cost = inf,G[ed.to][ed.rev].cost = -ed.cost;
     }
 
     if (~nodeId) {
@@ -264,10 +337,11 @@ void mcmf::adjustEdge(int rtIdx){
         nodeId ^= 1;
         G[nodeId][0].cap = 0;
 
+        
         for (int index = 1,size = G[nodeId].size(); index < size; index++) {
             edge &tmp = G[nodeId][index];
-            int towbIdx = ProductId2Workbench[tmp.to],toType = wb[towbIdx].type;
-            if (produce2sell[type].count(toType)) {
+            int towbIdx = ProductId2Workbench[tmp.to];
+            if (produce2sell[type].count(tmp.to)) {
                 tmp.cap = 1, G[tmp.to][tmp.rev].cap = 0;
                 tmp.cost = countSellValue(type,rtIdx,towbIdx);
                 G[tmp.to][tmp.rev].cost = -tmp.cost;
@@ -294,7 +368,13 @@ void mcmf::adjustTask(int rtIdx){
                 }
             }
         } else {
-            cerr << "destroyed " << endl;
+            cerr << "destroyed " <<rtIdx<< endl;
+            for (int i = 0,size = G[id].size(); i < size; i++) {
+                edge&ed = G[id][i];
+                if (G[ed.to][ed.rev].cap) {
+                    fprintf(stderr," %d %d %d -------> %d %d\n",id,i,ed.cap,ed.to,G[ed.to][ed.rev].cap);
+                }
+            }
             // TODO if this situation happen,this solution
         }
     } else {
@@ -309,43 +389,85 @@ void mcmf::adjustTask(int rtIdx){
     }
 }
 
-void solution() {
+void mcmf::checkDest(int rtIdx) {
+    robot &bot = rt[rtIdx];
+    if (bot.haveTemDest) { 
+        // 检查是否到达临时目的地附近
+        if (dis(bot.temDest, bot.location) < 0.5) {
+            // 视为到达
+            bot.haveTemDest = false;
+        }
+    } else {
+        if (bot.curTask.checkVaild()) {
+            if (bot.wb_id == bot.curTask.destId) {
+                // 到达当前工作目的地，交付工作
+                bot.cmd.buy = bot.curTask.buy;
+                bot.cmd.sell = bot.curTask.sell;
+                
+                if (bot.cmd.sell) {
+                    if (wb[bot.wb_id].type < 8) {
+                        int index = 0;
+                        switch (wb[bot.wb_id].type) {
+                        case 4:
+                            index = bot.pd_id == 2;
+                        case 5:
+                        case 6:
+                            index = bot.pd_id == 3;
+                            break;
+                        case 7:
+                            index = bot.pd_id - 4;
+                            break;
+                        default:
+                            break;
+                        }
+                        int id = workbenchProductId[bot.wb_id][index];
+                        setEdgeCap(id,0,0);
+                    }
+                    releaseNode(bot.nodeId); 
+                    bot.nodeId = -1,bot.pd_id = 0;
+                } else {
+                    // TODO: assume robot must buy material here,is it not realistic
+                    lockNode(rtIdx,bot.wb_id);
+                    bot.pd_id = wb[bot.wb_id].type;
+                }
+                bot.curTask.setVaild(0);
+            }
+        }
+    }
+}
+
+void mcmf::solution() {
     // 检查工作台状态
 
     //TODO parallel
-    for (int i = 0; i < K; ++i) {
-        if (wb[i].pstatus) {
-            // cerr<<i<<endl;
-            curFlow.allocateNode(i);
+    for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
+        if (wb[wbIdx].pstatus) {
+            curFlow.allocateNode(wbIdx);
         }
-        for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
-            int rstatus = wb[wbIdx].rstatus;
-            auto testAndSetEdgeCap = [&](int bit,int index){
-                if (!((rstatus >> bit) & 1)) {
-                    curFlow.setEdgeCap(curFlow.workbenchProductId[wbIdx][index],0,1);
-                }
-            };
-            switch (wb[wbIdx].type) {
-            case 4:
-                testAndSetEdgeCap(1,0);
-                testAndSetEdgeCap(2,1);
-                break;
-            case 5:
-                testAndSetEdgeCap(1,0);
-                testAndSetEdgeCap(3,1);
-                break;
-            case 6:
-                testAndSetEdgeCap(2,0);
-                testAndSetEdgeCap(3,1);
-                break;
-            case 7:
-                testAndSetEdgeCap(4,0);
-                testAndSetEdgeCap(5,1);
-                testAndSetEdgeCap(6,2);
-                break;
-            default:
-                break;
-            }
+        int rstatus = wb[wbIdx].rstatus;
+        auto testAndSetEdgeCap = [&](int bit,int index){
+            curFlow.setEdgeCap(curFlow.workbenchProductId[wbIdx][index],0, !((rstatus >> bit) & 1));
+        };
+        switch (wb[wbIdx].type) {
+        case 4:
+            testAndSetEdgeCap(1,0);
+            testAndSetEdgeCap(2,1);
+            break;
+        case 5:
+            testAndSetEdgeCap(1,0);
+            testAndSetEdgeCap(3,1);
+            break;
+        case 6:
+            testAndSetEdgeCap(2,0);
+            testAndSetEdgeCap(3,1);
+            break;
+        case 7:
+            testAndSetEdgeCap(4,0);
+            testAndSetEdgeCap(5,1);
+            testAndSetEdgeCap(6,2);
+            break;
+        default:
+            break;
         }
     }
 
@@ -356,14 +478,12 @@ void solution() {
         if (rt[rtIdx].holdTime) --rt[rtIdx].holdTime;
         rt[rtIdx].cmd.clean(); // 清除之前指令设置
         rt[rtIdx].checkSpeed();// 保证速度非0
-        rt[rtIdx].checkDest(); // 检查是否到达目的地
+        curFlow.checkDest(rtIdx);// 检查是否到达目的地
         curFlow.adjustEdge(rtIdx);// 调整网络
     }
-    if(frameID /10 == 5)
-    // for(int i = 0;i < curFlow.cnt;i++) for(auto e:curFlow.G[i]) if(e.cap>0)fprintf(stderr,"%d ---> %d\n",i,e.to);
     // 指令规划
     curFlow.solve(); // 费用流运行
-    // if(frameID>48)  cerr<<"检查费用流运行"<<' '<< "final" << endl;
+    
     auto setDest = [&](int rtIdx){
         //TODO merge this function into robot
         if (rt[rtIdx].haveTemDest) {
@@ -381,8 +501,9 @@ void solution() {
 
     // 碰撞避免
     collitionAvoidance();
-    // ori_collitionAvoidance(); 
 
+    // curFlow.showFlow();
+    // curFlow.showNodeEdge(curFlow.T);
     curFlow.resetCap();
     return;
 }
