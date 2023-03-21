@@ -11,6 +11,7 @@
 #define maxNode  WORKBENCH_SIZE * 4 + ROBOT_SIZE * 2 + poolSize * 2 
 #define inf  990000
 #define INF  1e18
+#define ROBOT_NUM 4
 #define vec coordinate
 using namespace std;
 
@@ -119,6 +120,7 @@ struct robot {
     int pd_id;    // 携带产品类型
     double tvc;   // 时间价值系数 Time value coefficient
     double cvc;   // 碰撞价值系数 Collision value coefficient
+    double pcvc;  // 前一帧的碰撞价值系数 Collision value coefficient
     double asp;   // Angular speed
     vec lsp;      // Linear speed
     double toward; // 朝向，弧度制
@@ -127,7 +129,7 @@ struct robot {
     void setSpeed(coordinate dest); // 负责从当前位置移动到目的地的线速度和角速度指令
 
     queue<task> taskQueue; // 任务队列
-    misson curMisson;
+    misson curMission;
     void checkDest();
     void checkTask();
     void checkSpeed();
@@ -237,8 +239,13 @@ extern int curMoney;                  // 当前金钱
 extern robot rt[ROBOT_SIZE];          // 机器人
 extern workbench wb[WORKBENCH_SIZE];  // 工作台
 extern char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
+extern int collisionNum[ROBOT_NUM];   // 碰撞次数
+extern int buyNum[8][ROBOT_NUM];      // 物品的购买次数
+extern int sellNum[8][ROBOT_NUM];     // 物品的出售次数
 extern double PI;                     // 圆周率
 extern mcmf curFlow;                  // 网络流实例
+extern ofstream fout;                 // 与日志文件关联的输出流
+
 
 extern map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 
