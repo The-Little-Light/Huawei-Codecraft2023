@@ -9,6 +9,7 @@ result.txt
 #忽略test.cpp
 test.cpp
 mergeMain.sh
+log.txt
 
 #忽略cmake的临时文件
 build/

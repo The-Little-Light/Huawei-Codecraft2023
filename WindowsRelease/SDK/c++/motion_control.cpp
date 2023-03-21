@@ -5,10 +5,9 @@
  * @LastEditors: Zym
  * @Description: 
  *      优化路径规划，并基本保证行星运动避免
+ *      添加对墙壁的碰撞避免
  ***/
 #include "solution.hpp"
-
-double PI = acos(-1);
 
 void robot::setSpeed(coordinate dest){
     double dx = dest.x - location.x;
@@ -38,6 +37,17 @@ void robot::setSpeed(coordinate dest){
     }
     else {
         minLSpeed = 6 * cos(absAngleDiff); 
+    }
+    // 对撞墙进行特判
+    if (taskQueue.size() == 1) {
+        coordinate detectPoint;                 // 探测点
+        detectPoint.set(location.x + 0.02 * lsp.x, location.y + 0.02 * lsp.y);
+        if ((detectPoint.x <= 0.77 && lsp.x < 0) || (detectPoint.x >= 50 - 0.77 && lsp.x > 0)) {
+            if (minLSpeed > 0) minLSpeed = 0.3 * minLSpeed;
+        }
+        else if ((detectPoint.y <= 0.77 && lsp.y < 0) || (detectPoint.y >= 50 - 0.77 && lsp.y > 0)) {
+            if (minLSpeed > 0) minLSpeed = 0.3 * minLSpeed;
+        }
     }
     cmd.forward = minLSpeed;
     // if (absAngleDiff * 7 > PI && dist < 1.2) {

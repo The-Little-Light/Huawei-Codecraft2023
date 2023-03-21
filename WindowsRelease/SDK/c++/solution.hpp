@@ -1,10 +1,10 @@
 #ifndef SOLUTION_HPP
 #define SOLUTION_HPP
 #include <bits/stdc++.h>
-#include<windows.h>
+#include <windows.h>
 #define MAP_SIZE 100
 #define WORKBENCH_SIZE 50
-#define ROBOT_SIZE 50
+#define ROBOT_SIZE 4
 // #define DEBUG
 //TODO polish
 #define poolSize  WORKBENCH_SIZE * 6    //产品池大小
@@ -82,13 +82,6 @@ struct task { // 机器人的当前目标工作
     }
 };
 
-struct parameter {
-    double para1, para2;
-    parameter() {
-        
-    }
-};
-
 /* 
 定义任务 m(A, x, B) 表示把物品x从A工作台购入并出售给B工作台
 任务价值函数 v(m) 表示完成任务m可以获得的潜在收益
@@ -119,6 +112,7 @@ struct robot {
     int pd_id;    // 携带产品类型
     double tvc;   // 时间价值系数 Time value coefficient
     double cvc;   // 碰撞价值系数 Collision value coefficient
+    double pcvc;  // 前一帧的碰撞价值系数 Collision value coefficient
     double asp;   // Angular speed
     vec lsp;      // Linear speed
     double toward; // 朝向，弧度制
@@ -127,10 +121,7 @@ struct robot {
     void setSpeed(coordinate dest); // 负责从当前位置移动到目的地的线速度和角速度指令
 
     queue<task> taskQueue; // 任务队列
-    misson curMisson;
-    void checkDest();
-    void checkTask();
-    void checkSpeed();
+    misson curMission;
 
     // 碰撞避免持续时间
     int holdTime = 0;
@@ -142,11 +133,15 @@ struct robot {
 
     // 当前任务
     task curTask;
-    
     //携带的产品来自的节点
     int nodeId = -1;
 
-    void setTemporaryDest(coordinate& td); // 设置临时目的地
+    void checkDest();
+    void MCMFcheckDest();
+    void checkTask();
+    void checkSpeed();
+    void findMission(vector<misson>&, coordinate&, vec&);
+    void setTemporaryDest(coordinate&); // 设置临时目的地
 };
 
 struct mcmf {
@@ -242,8 +237,13 @@ extern int curMoney;                  // 当前金钱
 extern robot rt[ROBOT_SIZE];          // 机器人
 extern workbench wb[WORKBENCH_SIZE];  // 工作台
 extern char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
-extern double PI;                     // 圆周率
+extern int collisionNum[ROBOT_SIZE];   // 碰撞次数
+extern int buyNum[8][ROBOT_SIZE];      // 物品的购买次数
+extern int sellNum[8][ROBOT_SIZE];     // 物品的出售次数
+extern const double PI;                     // 圆周率
 extern mcmf curFlow;                  // 网络流实例
+extern ofstream fout;                 // 与日志文件关联的输出流
+
 
 extern map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 
