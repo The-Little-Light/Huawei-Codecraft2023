@@ -129,7 +129,6 @@ void debug(){
         fprintf(stderr,"curtask.buy %d\n", (int) rt[robotId].curTask.buy);
         fprintf(stderr,"curtask.sell %d\n",  (int)rt[robotId].curTask.sell);
         fprintf(stderr,"destId %d\n", rt[robotId].curTask.destId);
-    
         fprintf(stderr,"nodeId %d\n\n\n", rt[robotId].nodeId);
 
     }
