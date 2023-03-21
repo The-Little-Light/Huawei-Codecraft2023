@@ -2,26 +2,12 @@
  * @Author: Xzx
  * @Date: 2023-03-14
  * @LastEditTime: 2023-03-20 00:22:44
- * @LastEditors: Xzh
+ * @LastEditors: Xzx
  * @Description: 
  *      引入势能场的概念，把碰撞处理从紧急避让变成引入势能较低点作为临时目的地（3-17）
  *      对势能场分布进行修正，加入角度考量（3-19）
  ***/
 #include "solution.hpp"
-// 向量模
-double modulusOfVector(vec& a) {
-    return sqrt(a.x*a.x + a.y*a.y);
-}
-
-// 向量叉积
-double crossProduct(vec& a, vec& b) {
-    return a.x * b.y - a.y * b.x;
-}
-
-// 向量点乘
-double dotProduct(vec& a, vec& b) {
-    return a.x * b.x + a.y * b.y;
-}
 
 // 计算势能分布 a 为角度，lsp 为线速度向量
 double cntR(double a, vec& lsp, double asp) {
@@ -43,17 +29,9 @@ double cntPontEnergy(int rtIdx, coordinate& d) {
     return 1.2 * cntR(angle, rbt.lsp, rbt.asp) / dis(d, rbt.location);
 }
 
-// 设置临时目的地
-void robot::setTemporaryDest(coordinate& td) {
-    temDest = td;
-    haveTemDest = true;
-    // 立即前往临时目的地
-    setSpeed(temDest);
-}
-
 void collitionAvoidance() {
     double u = 0.5; // 拥塞阈值
-    for (int curRt = 0; curRt < ROBOT_NUM; ++curRt) {
+    for (int curRt = 0; curRt < ROBOT_SIZE; ++curRt) {
         // if (rt[curRt].haveTemDest) continue;
         // 枚举每个机器人，计算其碰撞势能检测点受到的势能
         double pe = 0.0;                        // potentail energy
@@ -62,7 +40,7 @@ void collitionAvoidance() {
         coordinate& rLoca = rt[curRt].location;
         vec& lsp = rt[curRt].lsp;
         detectPoint.set(rLoca.x + 0.4 * lsp.x, rLoca.y + 0.4 * lsp.y);
-        for (int otherRt = 0; otherRt < ROBOT_NUM; ++otherRt) {
+        for (int otherRt = 0; otherRt < ROBOT_SIZE; ++otherRt) {
             if (curRt == otherRt) continue;
             double peComponent = cntPontEnergy(otherRt, detectPoint);
             pe += peComponent;
@@ -86,7 +64,7 @@ void collitionAvoidance() {
             //     coordinate aLeft(otLoca.x + dis_para * l_lsp.x, otLoca.y + dis_para * l_lsp.y);
             //     coordinate aRight(otLoca.x + dis_para * r_lsp.x, otLoca.y + dis_para * r_lsp.y);
             //     double aLeftPe = 0, aRightPe = 0;
-            //     for (int otherRt = 0; otherRt < ROBOT_NUM; ++otherRt) {
+            //     for (int otherRt = 0; otherRt < ROBOT_SIZE; ++otherRt) {
             //         if (curRt == otherRt) continue;
             //         aLeftPe += cntPontEnergy(otherRt, aLeft);
             //         aRightPe += cntPontEnergy(otherRt, aRight);
@@ -108,7 +86,7 @@ void collitionAvoidance() {
                 coordinate aLeft(rLoca.x + dis_para * l_lsp.x, rLoca.y + dis_para * l_lsp.y);
                 coordinate aRight(rLoca.x + dis_para * r_lsp.x, rLoca.y + dis_para * r_lsp.y);
                 double aLeftPe = 0, aRightPe = 0;
-                for (int otherRt = 0; otherRt < ROBOT_NUM; ++otherRt) {
+                for (int otherRt = 0; otherRt < ROBOT_SIZE; ++otherRt) {
                     if (curRt == otherRt) continue;
                     aLeftPe += cntPontEnergy(otherRt, aLeft);
                     aRightPe += cntPontEnergy(otherRt, aRight);
@@ -129,11 +107,11 @@ void collitionAvoidance() {
 void ori_collitionAvoidance() {
     // 检测机器人之间的运动向量，估计碰撞可能
     double colDiss = 3;
-    for (int rt1 = 0; rt1 < ROBOT_NUM; ++rt1) {
+    for (int rt1 = 0; rt1 < ROBOT_SIZE; ++rt1) {
         
         // if (rt[rt1].holdTime == 0)
         
-        for (int rt2 = 0; rt2 < ROBOT_NUM; ++rt2) {
+        for (int rt2 = 0; rt2 < ROBOT_SIZE; ++rt2) {
             if (rt1 == rt2) continue;
             coordinate& a = rt[rt1].location;
             coordinate& b = rt[rt2].location;

@@ -8,17 +8,16 @@
 #include "solution.hpp"
 using namespace std;
 
-int frameID;
+int frameID;                   // 当前帧
 int K;                         // 工作台数
-
 int N;                         // 机器人数
 int curMoney;                  // 当前金钱
 robot rt[ROBOT_SIZE];          // 机器人
 workbench wb[WORKBENCH_SIZE];  // 工作台
 char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
-int collisionNum[ROBOT_NUM];   // 碰撞次数
-int buyNum[8][ROBOT_NUM];      // 物品的购买次数
-int sellNum[8][ROBOT_NUM];     // 物品的出售次数
+int collisionNum[ROBOT_SIZE];   // 碰撞次数
+int buyNum[8][ROBOT_SIZE];      // 物品的购买次数
+int sellNum[8][ROBOT_SIZE];     // 物品的出售次数
 ofstream fout;                 // 与日志文件关联的输出流
 mcmf curFlow;                  // 网络流实例
 
@@ -39,7 +38,7 @@ void init() {
     profitAndTime[0] = make_pair(0, 10000);
     // 检测平台log
     fout.open("log.txt", ios_base::app);
-    for (int i = 0; i < ROBOT_NUM; ++i) rt[i].rtIdx = i+1;
+    for (int i = 0; i < ROBOT_SIZE; ++i) rt[i].rtIdx = i+1;
     profitAndTime[1] = make_pair(6000-3000, 50);
     profitAndTime[2] = make_pair(7600-4400, 50);
     profitAndTime[3] = make_pair(9200-5800, 50);
@@ -79,7 +78,6 @@ void init() {
             break;
         }
     }
-
     // 预初始化网络流
     curFlow.init();
 }
@@ -106,7 +104,7 @@ void readInfo() {
             &wb[i].pstatus
         ); wb[i].location.set(x, y);
     }
-    for (int i = 0; i < ROBOT_NUM; ++i) {
+    for (int i = 0; i < ROBOT_SIZE; ++i) {
         rt[i].pcvc = rt[i].cvc;
         scanf("%d %d %lf %lf %lf %lf %lf",
             &rt[i].wb_id,
@@ -176,7 +174,7 @@ int main() {
         // ori_solution();
         solution();
         /**************/
-        for(int robotId = 0; robotId < ROBOT_NUM; robotId++){
+        for(int robotId = 0; robotId < ROBOT_SIZE; robotId++){
             printRobotCommand(robotId);
         }
         if(frameID>48) debug();
@@ -186,14 +184,14 @@ int main() {
     
     fout << "******************************LOG INFORMATION START******************************";
     fout << endl << setw(15) << "ROBOT:";
-    for (int i = 1; i <= ROBOT_NUM; ++i)    fout << setw(8) << i;
+    for (int i = 1; i <= ROBOT_SIZE; ++i)    fout << setw(8) << i;
     fout << endl << setw(15) << "COLLOSION:";
-    for (int i = 0; i < ROBOT_NUM; ++i)    fout << setw(8) << collisionNum[i];
+    for (int i = 0; i < ROBOT_SIZE; ++i)    fout << setw(8) << collisionNum[i];
     for (int i = 1; i <= 7; ++i) {
         fout << endl << setw(10) << i << "_BUY:";
-        for (int j = 0; j < ROBOT_NUM; ++j)    fout << setw(8) << buyNum[i][j];
+        for (int j = 0; j < ROBOT_SIZE; ++j)    fout << setw(8) << buyNum[i][j];
         fout << endl << setw(9) << i << "_SELL:";
-        for (int j = 0; j < ROBOT_NUM; ++j)    fout << setw(8) << sellNum[i][j];
+        for (int j = 0; j < ROBOT_SIZE; ++j)    fout << setw(8) << sellNum[i][j];
     }
     fout << endl << "******************************LOG INFORMATION END*******************************" << endl << endl << endl;
     fout.close();

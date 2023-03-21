@@ -9,8 +9,6 @@
  ***/
 #include "solution.hpp"
 
-double PI = acos(-1);
-
 void robot::setSpeed(coordinate dest){
     double dx = dest.x - location.x;
     double dy = dest.y - location.y;
