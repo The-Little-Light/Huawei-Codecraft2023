@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzx
  * @Date: 2023-03-15 00:10:42
- * @LastEditTime: 2023-03-15 00:18:52
+ * @LastEditTime: 2023-03-21 10:07:42
  * @LastEditors: Xzh
  * @Description: 
  */
@@ -10,16 +10,30 @@ using namespace std;
 
 int frameID;
 int K;                         // 工作台数
+int N;                         // 机器人数
+int curMoney;                  // 当前金钱
 robot rt[ROBOT_SIZE];          // 机器人
 workbench wb[WORKBENCH_SIZE];  // 工作台
 char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
+mcmf curFlow;                  // 网络流实例
 
 map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 
 pair<int,int> profitAndTime[8];
 
+
 void init() {
-    for (int i = 0; i < 4; ++i) rt[i].rtIdx = i+1;
+    // 初始化工作台信息
+    K = 0;
+    for(int i = 0; i < MAP_SIZE; ++i){
+        for(int j = 0; j < MAP_SIZE; ++j){
+            if(isdigit(plat[i][j])) wb[K++].type = plat[i][j] - '0';
+            if(plat[i][j] == 'A') N++;
+        }
+    }
+
+    for (int i = 0; i < 4; ++i) rt[i].rtIdx = i;
+    profitAndTime[0] = make_pair(0, 10000);
     profitAndTime[1] = make_pair(6000-3000, 50);
     profitAndTime[2] = make_pair(7600-4400, 50);
     profitAndTime[3] = make_pair(9200-5800, 50);
@@ -59,6 +73,9 @@ void init() {
             break;
         }
     }
+
+    // 预初始化网络流
+    curFlow.init();
 }
 
 
@@ -72,7 +89,6 @@ void readPlat() {
 
 void readInfo() {
     char line[3];
-    int curMoney;
     double x, y;
     scanf("%d %d",&curMoney, &K);
     for (int i = 0; i < K; ++i) {
@@ -100,6 +116,27 @@ void readInfo() {
     }
     getchar();
     fgets(line, sizeof line, stdin); // receive OK
+
+}
+
+void debug(){
+    for(int robotId = 0; robotId < 4; robotId++){
+        if (rt[robotId].cmd.sell)  fprintf(stderr,"sell %d\n", robotId);
+        if (rt[robotId].cmd.buy)  fprintf(stderr,"buy %d\n", robotId);
+        if (rt[robotId].cmd.destroy)  fprintf(stderr,"destroy %d\n", robotId);
+        fprintf(stderr,"forward %d %f\n", robotId, rt[robotId].cmd.forward);
+        fprintf(stderr,"rotate %d %f\n", robotId, rt[robotId].cmd.rotate);
+        fprintf(stderr,"curtask %d\n", (int) rt[robotId].curTask.buy);
+        fprintf(stderr,"curtask %d\n",  (int)rt[robotId].curTask.sell);
+        fprintf(stderr,"curtask %d\n", rt[robotId].curTask.destId);
+    
+        fprintf(stderr,"curtask %d\n", rt[robotId].nodeId);
+    }
+    cerr<<"cnt : "<<curFlow.cnt<<endl;
+    cerr<<"curpool : "<<curFlow.curSize<<endl;
+    cerr<<"curframeID : "<<frameID<<endl;
+    cerr<<"--------------------------\n";
+
 }
 
 void printRobotCommand(int robotId) {
@@ -108,28 +145,30 @@ void printRobotCommand(int robotId) {
     if (rt[robotId].cmd.destroy)  printf("destroy %d\n", robotId);
     printf("forward %d %f\n", robotId, rt[robotId].cmd.forward);
     printf("rotate %d %f\n", robotId, rt[robotId].cmd.rotate);
-    // cerr << "rotate " << robotId << " " << rt[robotId].cmd.rotate << endl;
-    // cerr << "forward " << robotId << " " << rt[robotId].cmd.forward << endl;
 }
 
 int main() {
-    bool initMark = true;
+    // bool initMark = true;
     readPlat();
+    init();
     puts("OK");
     fflush(stdout);
     while (scanf("%d", &frameID) != EOF) {
         readInfo();
-        if (initMark) {
-            init();
-            initMark = false;
-        }
+        
+        // if (initMark) {
+        //     init();
+        //     initMark = false;
+        // }
         printf("%d\n", frameID);
         /**** CORE ****/
+        // ori_solution();
         solution();
         /**************/
         for(int robotId = 0; robotId < 4; robotId++){
             printRobotCommand(robotId);
         }
+        // if(frameID>48) debug();
         printf("OK\n");
         fflush(stdout);
     }
