@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzx
  * @Date: 2023-03-15 00:10:42
- * @LastEditTime: 2023-03-21 10:30:53
+ * @LastEditTime: 2023-03-21 21:16:11
  * @LastEditors: Xzh
  * @Description: 
  */
@@ -135,6 +135,7 @@ void debug(){
     cerr<<"cnt : "<<curFlow.cnt<<endl;
     cerr<<"curpool : "<<curFlow.curSize<<endl;
     cerr<<"curframeID : "<<frameID<<endl;
+    cerr<<"flow : "<<curFlow.flow<<endl;
     cerr<<"--------------------------\n";
 
 }
@@ -163,12 +164,12 @@ int main() {
         printf("%d\n", frameID);
         /**** CORE ****/
         // ori_solution();
-        solution();
+        curFlow.solution();
         /**************/
         for(int robotId = 0; robotId < 4; robotId++){
             printRobotCommand(robotId);
         }
-        if(frameID>48) debug();
+        // if(frameID>48) debug();
         printf("OK\n");
         fflush(stdout);
     }

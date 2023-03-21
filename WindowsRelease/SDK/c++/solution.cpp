@@ -70,26 +70,26 @@ void misson::countValue(coordinate& rtCo, int proType, vec& lsp) {
     v = para1 / tt + para2 * vv;
 } 
 
-// void robot::checkDest() {
-//     if (haveTemDest) { 
-//         // 检查是否到达临时目的地附近
-//         if (dis(temDest, location) < 0.5) {
-//             // 视为到达
-//             haveTemDest = false;
-//         }
-//     }
-//     else {
-//         if (!taskQueue.empty()) {
-//             task& curTask = taskQueue.front();
-//             if (wb_id == curTask.destId) {
-//                 // 到达当前工作目的地，交付工作
-//                 cmd.buy = curTask.buy;
-//                 cmd.sell = curTask.sell;
-//                 taskQueue.pop();
-//             }
-//         }
-//     }
-// }
+void robot::checkDest() {
+    if (haveTemDest) { 
+        // 检查是否到达临时目的地附近
+        if (dis(temDest, location) < 0.5) {
+            // 视为到达
+            haveTemDest = false;
+        }
+    }
+    else {
+        if (!taskQueue.empty()) {
+            task& curTask = taskQueue.front();
+            if (wb_id == curTask.destId) {
+                // 到达当前工作目的地，交付工作
+                cmd.buy = curTask.buy;
+                cmd.sell = curTask.sell;
+                taskQueue.pop();
+            }
+        }
+    }
+}
 
 void robot::checkTask() {
     if (taskQueue.empty()) {

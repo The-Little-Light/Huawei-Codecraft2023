@@ -199,6 +199,7 @@ struct mcmf {
     int pe[maxNode];                         // 最短路上的前驱边
     int stateBuf[ROBOT_SIZE][20][2];         // 用于权值回退
     int bufCur = 0;                          // 已使用的Buf数
+    int flow = 0;
 
     
     int getNode(){return cnt++;}
@@ -215,6 +216,10 @@ struct mcmf {
     void adjustEdge(int rtIdx);         // 每帧开始时为机器人调整边权
     void adjustTask(int rtIdx);         // 每帧开始时根据费用流为机器人调整任务
     void resetCap();                    // 每帧结束时回退费用流
+    void showNodeEdge(int id,int condition = 1); //打印输出某一个节点的所有边
+    void showFlow(int condition = 1,int detailed = 0);   // 可视化当前网络流                 
+    void solution();
+    void checkDest(int rtIdx);
 
     // 以下计算的为代价,越小优先级越大
     // 计算价值函数,计算机器人购买产品后，将其运往出售的开销
