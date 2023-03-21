@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzx
  * @Date: 2023-03-15 00:10:42
- * @LastEditTime: 2023-03-21 10:07:42
+ * @LastEditTime: 2023-03-21 10:30:53
  * @LastEditors: Xzh
  * @Description: 
  */
@@ -126,11 +126,12 @@ void debug(){
         if (rt[robotId].cmd.destroy)  fprintf(stderr,"destroy %d\n", robotId);
         fprintf(stderr,"forward %d %f\n", robotId, rt[robotId].cmd.forward);
         fprintf(stderr,"rotate %d %f\n", robotId, rt[robotId].cmd.rotate);
-        fprintf(stderr,"curtask %d\n", (int) rt[robotId].curTask.buy);
-        fprintf(stderr,"curtask %d\n",  (int)rt[robotId].curTask.sell);
-        fprintf(stderr,"curtask %d\n", rt[robotId].curTask.destId);
+        fprintf(stderr,"curtask.buy %d\n", (int) rt[robotId].curTask.buy);
+        fprintf(stderr,"curtask.sell %d\n",  (int)rt[robotId].curTask.sell);
+        fprintf(stderr,"destId %d\n", rt[robotId].curTask.destId);
     
-        fprintf(stderr,"curtask %d\n", rt[robotId].nodeId);
+        fprintf(stderr,"nodeId %d\n\n\n", rt[robotId].nodeId);
+
     }
     cerr<<"cnt : "<<curFlow.cnt<<endl;
     cerr<<"curpool : "<<curFlow.curSize<<endl;
@@ -168,7 +169,7 @@ int main() {
         for(int robotId = 0; robotId < 4; robotId++){
             printRobotCommand(robotId);
         }
-        // if(frameID>48) debug();
+        if(frameID>48) debug();
         printf("OK\n");
         fflush(stdout);
     }
