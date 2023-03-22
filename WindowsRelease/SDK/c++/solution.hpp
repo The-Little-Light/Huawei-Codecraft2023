@@ -74,13 +74,6 @@ struct task { // 机器人的当前目标工作
         sell = s;
     }
     task():destId(-1),destCo(0,0){}
-    void setVaild(int k){
-        destId = k - 1;
-        destCo = coordinate(0,0);
-    }
-    bool checkVaild(){
-        return ~destId;
-    }
 };
 
 /* 

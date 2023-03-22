@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-22 22:21:33
+ * @LastEditTime: 2023-03-23 03:43:15
  * @LastEditors: Xzh
  * @Description: 
  *      引入最小费用最大流进行全局任务规划，优化任务分配
@@ -30,13 +30,12 @@ void mcmf::init(){
     // 建立原料格对汇点的边
     for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
         switch (wb[wbIdx].type) {
-        case 7:
-            setID(workbenchProductId[wbIdx][2],wbIdx,1);
         case 4:
         case 5:
         case 6:
-            setID(workbenchProductId[wbIdx][1],wbIdx,1);
+        case 7:
             setID(workbenchProductId[wbIdx][0],wbIdx,1);
+            setID(workbenchProductId[wbIdx][1],wbIdx,1);
             break;
         case 8:
         case 9:
@@ -44,6 +43,9 @@ void mcmf::init(){
             break;
         default:
             break;
+        }
+        if (wb[wbIdx].type == 7) {
+            setID(workbenchProductId[wbIdx][2],wbIdx,1);
         }
     }
     // 建立产品型号到收购方原材料格id的映射
@@ -266,7 +268,7 @@ void mcmf::showFlow(int condition,int detailed) {
                 do {
                     pv = stateBuf[i][index][0],pe = stateBuf[i][index][1];
                     edge &ed = G[pv][pe];
-                    fprintf(stderr,"%d %d -----> %d %d\n",pv,ed.cap,ed.to,G[ed.to][ed.rev].cap);
+                    fprintf(stderr,"%d %d %f-----> %d %d\n",pv,ed.cap,ed.to,ed.cost,G[ed.to][ed.rev].cap);
                     ++index;
                 }while(pv != S);
                 fprintf(stderr,"\n");
@@ -319,7 +321,7 @@ void mcmf::adjustEdge(int rtIdx){
             ed.cost = countBuyValue(type,rtIdx,ProductId2Workbench[ed.to]);
             G[ed.to][ed.rev].cost = -ed.cost;
             // if (nodeId < 0) ed.cap = 1,G[tmp.to][tmp.rev].cap = 0;
-        } else ed.cost = inf,G[ed.to][ed.rev].cost = -ed.cost;
+        } else ed.cost = 0,G[ed.to][ed.rev].cost = -ed.cost;
     }
 
     if (~nodeId) {
@@ -364,6 +366,7 @@ int mcmf::checkVaild(double a) {
 void mcmf::adjustTask(int rtIdx){
     int id = robotId[rtIdx];
 
+    rt[rtIdx].curTask.destId = -1;
     int nextId = -1,nodeId = rt[rtIdx].nodeId,type = rt[rtIdx].pd_id;
 
     if (~nodeId) {
@@ -471,6 +474,7 @@ void mcmf::checkDest(int rtIdx) {
                         switch (wb[bot.wb_id].type) {
                         case 4:
                             index = bot.pd_id == 2;
+                            break;
                         case 5:
                         case 6:
                             index = bot.pd_id == 3;
@@ -491,7 +495,7 @@ void mcmf::checkDest(int rtIdx) {
                     lockNode(rtIdx,bot.wb_id);
                     bot.pd_id = wb[bot.wb_id].type;
                 }
-                bot.curTask.setVaild(0);
+                bot.curTask.destId = -1;
             }
         }
     }
@@ -546,7 +550,7 @@ void mcmf::solution() {
     auto setDest = [&](int rtIdx){
         if (rt[rtIdx].haveTemDest) {
             rt[rtIdx].setSpeed(rt[rtIdx].temDest);
-        } else if(rt[rtIdx].curTask.checkVaild()) {
+        } else if(rt[rtIdx].curTask.destId != -1) {
             rt[rtIdx].setSpeed(rt[rtIdx].curTask.destCo);
         }
     };
@@ -566,7 +570,7 @@ void mcmf::solution() {
         }
     };
 
-    // showFlow(frameID >= 1000 && frameID <= 1500);
+    // showFlow(frameID >= 4640 && frameID <= 4660);
     // showNodeEdge(T);
     // printError();
 
