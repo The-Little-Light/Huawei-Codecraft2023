@@ -1,10 +1,10 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-22 19:01:19
+ * @LastEditTime: 2023-03-22 22:21:33
  * @LastEditors: Xzh
  * @Description: 
- *      引入最小费用最大流对进行全局任务规划，优化任务分配
+ *      引入最小费用最大流进行全局任务规划，优化任务分配
  */
 
 #include "solution.hpp"
@@ -191,9 +191,7 @@ int mcmf::spfa(){
     vis[S] = 1,shortDis[S] = 0;
     q.push_back(S);
 
-    int h = 0;
     while(q.size()){
-        h = max<int>(q.size(),h);
         int n = q.front();q.pop_front();
         double d = shortDis[n];
         vis[n] = 0;
@@ -434,7 +432,7 @@ void mcmf::adjustTask(int rtIdx){
                 //     fprintf(stderr," wbIdx : %d  rstatus : %d\n", wbIdx, rstatus);
                 // }
 
-                curFlow.showFlow();
+                showFlow();
                 cerr << endl;
             }
             
@@ -504,11 +502,11 @@ void mcmf::solution() {
     //TODO parallel
     for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
         if (wb[wbIdx].pstatus) {
-            curFlow.allocateNode(wbIdx);
+            allocateNode(wbIdx);
         }
         int rstatus = wb[wbIdx].rstatus;
         auto testAndSetEdgeCap = [&](int bit,int index){
-            curFlow.setEdgeCap(curFlow.workbenchProductId[wbIdx][index],0, !((rstatus >> bit) & 1));
+            setEdgeCap(workbenchProductId[wbIdx][index],0, !((rstatus >> bit) & 1));
         };
         switch (wb[wbIdx].type) {
         case 4:
@@ -539,14 +537,13 @@ void mcmf::solution() {
         if (rt[rtIdx].holdTime) --rt[rtIdx].holdTime;
         rt[rtIdx].cmd.clean(); // 清除之前指令设置
         rt[rtIdx].checkSpeed();// 保证速度非0
-        curFlow.checkDest(rtIdx);// 检查是否到达目的地
-        curFlow.adjustEdge(rtIdx);// 调整网络
+        checkDest(rtIdx);// 检查是否到达目的地
+        adjustEdge(rtIdx);// 调整网络
     }
     // 指令规划
-    curFlow.solve(); // 费用流运行
+    solve(); // 费用流运行
     
     auto setDest = [&](int rtIdx){
-        //TODO merge this function into robot
         if (rt[rtIdx].haveTemDest) {
             rt[rtIdx].setSpeed(rt[rtIdx].temDest);
         } else if(rt[rtIdx].curTask.checkVaild()) {
@@ -556,7 +553,7 @@ void mcmf::solution() {
     //TODO parallel
     // 检查调整机器人任务执行
     for (int rtIdx = 0; rtIdx < N; ++rtIdx) {
-        curFlow.adjustTask(rtIdx);// 调整任务
+        adjustTask(rtIdx);// 调整任务
         setDest(rtIdx);
     }
 
@@ -564,15 +561,15 @@ void mcmf::solution() {
     collitionAvoidance();
 
     auto printError = [&]() {
-        if (curFlow.flow != N && frameID >= 50) {
+        if (flow != N && frameID >= 50) {
             fprintf(stderr, "flow Error curframeID : %d\n\n",frameID);
         }
     };
 
-    // curFlow.showFlow(frameID >= 1000 && frameID <= 1500);
-    // curFlow.showNodeEdge(curFlow.T);
+    // showFlow(frameID >= 1000 && frameID <= 1500);
+    // showNodeEdge(T);
     // printError();
 
-    curFlow.resetCap();
+    resetCap();
     return;
 }
