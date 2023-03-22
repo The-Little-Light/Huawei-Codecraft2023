@@ -192,7 +192,7 @@ struct mcmf {
     int vis[maxNode];                        // 顶点是否在队列中
     int pre[maxNode];                        // 最短路上的前驱节点
     int pe[maxNode];                         // 最短路上的前驱边
-    int stateBuf[ROBOT_SIZE][20][2];         // 用于权值回退
+    int stateBuf[ROBOT_SIZE][ROBOT_SIZE * 15][2];// 用于权值回退
     int bufCur = 0;                          // 已使用的Buf数
     int flow = 0;
 
@@ -215,6 +215,7 @@ struct mcmf {
     void showFlow(int condition = 1,int detailed = 0);   // 可视化当前网络流                 
     void solution();
     void checkDest(int rtIdx);
+    int checkVaild(double a);           // 检测浮点数类型
 
     // 以下计算的为代价,越小优先级越大
     // 计算价值函数,计算机器人购买产品后，将其运往出售的开销
@@ -254,6 +255,7 @@ extern double crossProduct(vec& a, vec& b);
 extern double dotProduct(vec& a, vec& b);
 extern double modulusOfVector(vec& a);
 extern double cntAngle(vec& a, vec& b);
+
 void collitionAvoidance();
 void ori_collitionAvoidance();
 void ori_solution();
