@@ -1,8 +1,8 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-21 21:27:39
- * @LastEditors: Xzx
+ * @LastEditTime: 2023-03-22 15:51:07
+ * @LastEditors: Xzh
  * @Description: 
  *      引入最小费用最大流对进行全局任务规划，优化任务分配
  */
@@ -251,7 +251,7 @@ void mcmf::showNodeEdge(int id, int condition) {
 
 void mcmf::showFlow(int condition,int detailed) {
     if (condition) {
-        fprintf(stderr,"\n");
+        fprintf(stderr,"frameID : %d \n",frameID);
         for (int i = 0; i < bufCur; i++){
             int index = 0,pe,pv;
             fprintf(stderr,"%d ",T);
@@ -349,6 +349,22 @@ void mcmf::adjustEdge(int rtIdx){
     } 
 }
 
+/**
+ *return value : 
+ *   0 when a is normal value;
+ *   1 when a is NaN;
+ *   0 when a is inf;
+ */
+int mcmf::checkVaild(double a) {
+    if (isnan(a)) {
+        return 1;
+    } else if (isinf(a)) {
+        return 2;
+    } else {
+        return 0;
+    }
+}
+
 void mcmf::adjustTask(int rtIdx){
     int id = robotId[rtIdx];
 
@@ -367,13 +383,56 @@ void mcmf::adjustTask(int rtIdx){
                 }
             }
         } else {
-            cerr << "destroyed " <<rtIdx<< endl;
-            // for (int i = 0,size = G[id].size(); i < size; i++) {
-            //     edge&ed = G[id][i];
-            //     if (G[ed.to][ed.rev].cap) {
-            //         fprintf(stderr," %d %d %d -------> %d %d\n",id,i,ed.cap,ed.to,G[ed.to][ed.rev].cap);
-            //     }
-            // }
+            cerr << "destroyed " <<rtIdx << "  curframeID " <<frameID<< endl;
+            int debugLevel = 1;    // 调试级别 0不输出报错信息,1表示简略的报错信息，2是详细的报错信息。
+            int errorType = 0;
+
+            if (debugLevel) {
+                auto check = [&](int id) -> int {
+                    int flag = 0;
+                    for (int i = 0,size = G[id].size(); i < size; i++) {
+                        edge&ed = G[id][i];
+                        if (G[ed.to][ed.rev].cap || ed.cap) {
+                            if (debugLevel > 1)
+                            fprintf(stderr,"%d %d %d -------> %d %d %f %f\n",id,i,ed.cap,ed.to,G[ed.to][ed.rev].cap,ed.cost,G[ed.to][ed.rev].cost);
+                            flag |= checkVaild(ed.cost);
+                        }
+                    }
+                    if (debugLevel > 1) cerr << endl;
+                    errorType |= flag;
+                    return flag;
+                };
+
+                auto printError = [&](const char *pre,int flag) {
+                    if (flag & 1) fprintf(stderr,"%s   NaN checked\n",pre);
+                    if (flag & 2) fprintf(stderr,"%s   inf checked\n",pre);       
+                    if (flag & 4) fprintf(stderr,"%s   Unknown Error\n",pre);       
+                };
+
+                printError("countBuyValue",check(id));
+
+                cerr << "nodeId "<<nodeId << endl;
+                check(nodeId);
+
+                int tmpId = nodeId ^ 1;
+                printError("countSellValue",check(tmpId));
+
+
+                vector<int> de;
+                for (int i = 0,size = G[tmpId].size(); i < size; i++) {
+                    edge&ed = G[tmpId][i];
+                    if (ed.cap) de.push_back(ed.to);
+                }
+
+                for (auto id : de) {
+                    check(id);
+                    printError("countSellValue | countValue",check(id));
+                }
+
+                if (!errorType) printError("",4);
+                cerr << endl;
+            }
+            
             // TODO if this situation happen,this solution
         }
     } else {
@@ -499,8 +558,16 @@ void mcmf::solution() {
     // 碰撞避免
     collitionAvoidance();
 
-    // curFlow.showFlow();
+    auto printError = [&]() {
+        if (curFlow.flow != N && frameID >= 50) {
+            fprintf(stderr, "flow Error curframeID : %d\n\n",frameID);
+        }
+    };
+
+    // curFlow.showFlow(frameID >= 1000 && frameID <= 1500);
     // curFlow.showNodeEdge(curFlow.T);
+    printError();
+
     curFlow.resetCap();
     return;
 }
