@@ -97,7 +97,6 @@ double mcmf::countValue(int proType,int startIndex,int endIndex) {
     coordinate s = wb[startIndex].location;
     coordinate e = wb[endIndex].location;
     double dd = dis(s, e);                  // 机器人从起点到终点的距离
-    vec s2e(e.x - s.x, e.y - s.y);          // 起点到终点的向量
     double tt = dd/6 + 1;
     double vv = profitAndTime[proType].first.first; // 出售收入
     double nextVv = profitAndTime[wb[endIndex].type].first.first - profitAndTime[wb[endIndex].type].first.second;
@@ -106,10 +105,10 @@ double mcmf::countValue(int proType,int startIndex,int endIndex) {
         vv *= 0.8;
     }
     else if (wb[endIndex].type == 7) {
-        vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
+        vv += 0.35*nextVv/(4-wb[endIndex].rawMaterNum());
     }
     else if (wb[endIndex].type > 3) {
-        vv += 0.35*nextVv/(2-wb[endIndex].rawMaterNum());
+        vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
     }
     return  - ( para2 * vv + para1 / tt) + inf;
 }
@@ -125,16 +124,15 @@ double mcmf::countSellValue(int proType,int rtIdx,int endIndex){
     double tt = dd/6 + rr/PI + 1;
     double vv = profitAndTime[proType].first.first; // 出售收入
     double nextVv = profitAndTime[wb[endIndex].type].first.first - profitAndTime[wb[endIndex].type].first.second;
-
     // 考虑剩余原材料格对价值的影响，目标工作台的剩余材料格越少越重视
     if (wb[endIndex].type > 7) {
         vv *= 0.8;
     }
     else if (wb[endIndex].type == 7) {
-        vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
+        vv += 0.35*nextVv/(4-wb[endIndex].rawMaterNum());
     }
     else if (wb[endIndex].type > 3) {
-        vv += 0.35*nextVv/(2-wb[endIndex].rawMaterNum());
+        vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
     }
     return  - ( para2 * vv + para1 / tt) + inf;
 }
