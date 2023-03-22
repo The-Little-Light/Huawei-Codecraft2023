@@ -15,9 +15,6 @@ int curMoney;                  // 当前金钱
 robot rt[ROBOT_SIZE];          // 机器人
 workbench wb[WORKBENCH_SIZE];  // 工作台
 char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
-int collisionNum[ROBOT_SIZE];   // 碰撞次数
-int buyNum[8][ROBOT_SIZE];      // 物品的购买次数
-int sellNum[8][ROBOT_SIZE];     // 物品的出售次数
 ofstream fout;                 // 与日志文件关联的输出流
 mcmf curFlow;                  // 网络流实例
 
@@ -118,10 +115,6 @@ void readInfo() {
             &rt[i].toward,
             &x, &y // location
         ); rt[i].location.set(x, y);
-        if ((rt[i].pcvc - rt[i].cvc >= 0.001) && (rt[i].cvc > 0.79)) {
-            // fout << frameID << "(" << "robot" << i+1 << ")" << ": " << rt[i].pcvc << " -> " << rt[i].cvc << endl;
-            ++collisionNum[i];
-        }
     }
     getchar();
     fgets(line, sizeof line, stdin); // receive OK
@@ -171,7 +164,12 @@ int main() {
         //     initMark = false;
         // }
         printf("%d\n", frameID);
-        /**** CORE ****/
+        // 各个机器人统计是否产生碰撞、购买、出售等行为
+        for(int robotId = 0; robotId < ROBOT_SIZE; robotId++){            
+            rt[robotId].collisionCount();
+            rt[robotId].buysellCount();
+        } 
+        /**** CORE ****/   
         // ori_solution();
         curFlow.solution();
         /**************/
@@ -182,20 +180,8 @@ int main() {
         printf("OK\n");
         fflush(stdout);
     }
-    
-    fout << "******************************LOG INFORMATION START******************************";
-    fout << endl << setw(15) << "ROBOT:";
-    for (int i = 1; i <= ROBOT_SIZE; ++i)    fout << setw(8) << i;
-    fout << endl << setw(15) << "COLLOSION:";
-    for (int i = 0; i < ROBOT_SIZE; ++i)    fout << setw(8) << collisionNum[i];
-    for (int i = 1; i <= 7; ++i) {
-        fout << endl << setw(10) << i << "_BUY:";
-        for (int j = 0; j < ROBOT_SIZE; ++j)    fout << setw(8) << buyNum[i][j];
-        fout << endl << setw(9) << i << "_SELL:";
-        for (int j = 0; j < ROBOT_SIZE; ++j)    fout << setw(8) << sellNum[i][j];
-    }
-    fout << endl << "******************************LOG INFORMATION END*******************************" << endl << endl << endl;
-    fout.close();
+
+    printLog();
 
     return 0;
 }

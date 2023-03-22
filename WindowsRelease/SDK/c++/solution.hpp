@@ -2,6 +2,7 @@
 #define SOLUTION_HPP
 #include <bits/stdc++.h>
 #include <windows.h>
+#include "util.hpp"
 #define MAP_SIZE 100
 #define WORKBENCH_SIZE 50
 #define ROBOT_SIZE 4
@@ -118,6 +119,9 @@ struct robot {
     double toward; // 朝向，弧度制
     coordinate location;
     command cmd;  // 当前帧要发布的控制指令
+    int collisionNum;  // 碰撞次数
+    int buyNum[8];     // 物品的购买次数
+    int sellNum[8];    // 物品的出售次数
     void setSpeed(coordinate dest); // 负责从当前位置移动到目的地的线速度和角速度指令
 
     queue<task> taskQueue; // 任务队列
@@ -142,6 +146,10 @@ struct robot {
     void checkSpeed();
     void findMission(vector<misson>&, coordinate&, vec&);
     void setTemporaryDest(coordinate&); // 设置临时目的地
+
+    // 用于统计
+    void collisionCount();
+    void buysellCount();
 };
 
 struct mcmf {

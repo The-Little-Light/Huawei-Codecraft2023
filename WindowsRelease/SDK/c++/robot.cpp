@@ -1,5 +1,21 @@
 #include "solution.hpp"
 
+// 统计碰撞次数
+void robot::collisionCount() {    
+    if ((pcvc - cvc >= 0.001) && (cvc > 0.79)) {
+        // fout << frameID << "(" << "robot" << rtIdx << ")" << ": " << pcvc << " -> " << cvc << endl;
+        ++collisionNum;
+    }
+}
+
+// 统计购买与出售次数
+void robot::buysellCount() {
+    if (!haveTemDest && curTask.checkVaild() && wb_id == curTask.destId) {
+        if (curTask.buy)   ++buyNum[wb[wb_id].type];
+        if (curTask.sell)  ++sellNum[pd_id];
+    } 
+}
+
 // 设置临时目的地
 void robot::setTemporaryDest(coordinate& td) {
     temDest = td;
@@ -23,9 +39,7 @@ void robot::checkDest() {
             if (wb_id == curTask.destId) {
                 // 到达当前工作目的地，交付工作
                 cmd.buy = curTask.buy;
-                if (cmd.buy) ++buyNum[curMission.proType][rtIdx-1];
                 cmd.sell = curTask.sell;
-                if (cmd.sell) ++sellNum[curMission.proType][rtIdx-1];
                 taskQueue.pop();
             }
         }
