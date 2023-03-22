@@ -155,8 +155,8 @@ struct robot {
 struct mcmf {
     
     const double eps = 1e-6;
-    const double para1 = 950000;
-    const double para2 = 7;
+    const double para1 = 95000;
+    const double para2 = 0.7;
 
 
     int S, T;
@@ -200,7 +200,7 @@ struct mcmf {
     int vis[maxNode];                        // 顶点是否在队列中
     int pre[maxNode];                        // 最短路上的前驱节点
     int pe[maxNode];                         // 最短路上的前驱边
-    int stateBuf[ROBOT_SIZE][20][2];         // 用于权值回退
+    int stateBuf[ROBOT_SIZE][ROBOT_SIZE * 15][2];// 用于权值回退
     int bufCur = 0;                          // 已使用的Buf数
     int flow = 0;
 
@@ -213,7 +213,7 @@ struct mcmf {
     int solve();                        // 基于spfa计算最小费用流
 
     void releaseNode(int id);           // 将某个节点移入空闲节点池
-    void lockNode(int rtIdx,int wbIdx);           // 工作台产品被机器人获取
+    void lockNode(int rtIdx,int wbIdx); // 工作台产品被机器人获取
     void allocateNode(int wbIdx);       // 为工作台产品分配节点
 
     void adjustEdge(int rtIdx);         // 每帧开始时为机器人调整边权
@@ -223,6 +223,7 @@ struct mcmf {
     void showFlow(int condition = 1,int detailed = 0);   // 可视化当前网络流                 
     void solution();
     void checkDest(int rtIdx);
+    int checkVaild(double a);           // 检测浮点数类型
 
     // 以下计算的为代价,越小优先级越大
     // 计算价值函数,计算机器人购买产品后，将其运往出售的开销
@@ -245,20 +246,24 @@ extern int curMoney;                  // 当前金钱
 extern robot rt[ROBOT_SIZE];          // 机器人
 extern workbench wb[WORKBENCH_SIZE];  // 工作台
 extern char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
-extern const double PI;                     // 圆周率
+extern int collisionNum[ROBOT_SIZE];  // 碰撞次数
+extern int buyNum[8][ROBOT_SIZE];     // 物品的购买次数
+extern int sellNum[8][ROBOT_SIZE];    // 物品的出售次数
+extern const double PI;               // 圆周率
 extern mcmf curFlow;                  // 网络流实例
 extern ofstream fout;                 // 与日志文件关联的输出流
 
 
 extern map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 
-extern pair<int,int> profitAndTime[8];
+extern pair<pair<int,int>,int> profitAndTime[8];
 
 extern double dis(coordinate& c1, coordinate& c2);
 extern double crossProduct(vec& a, vec& b);
 extern double dotProduct(vec& a, vec& b);
 extern double modulusOfVector(vec& a);
 extern double cntAngle(vec& a, vec& b);
+
 void collitionAvoidance();
 void ori_collitionAvoidance();
 void ori_solution();

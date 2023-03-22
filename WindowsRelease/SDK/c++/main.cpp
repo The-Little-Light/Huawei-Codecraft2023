@@ -20,7 +20,7 @@ mcmf curFlow;                  // 网络流实例
 
 map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 
-pair<int,int> profitAndTime[8];
+pair<pair<int,int>,int> profitAndTime[8];
 
 
 void init() {
@@ -32,17 +32,17 @@ void init() {
             if(plat[i][j] == 'A') N++;
         }
     }
-    profitAndTime[0] = make_pair(0, 10000);
     // 检测平台log
     fout.open("log.txt", ios_base::app);
     for (int i = 0; i < ROBOT_SIZE; ++i) rt[i].rtIdx = i+1;
-    profitAndTime[1] = make_pair(6000-3000, 50);
-    profitAndTime[2] = make_pair(7600-4400, 50);
-    profitAndTime[3] = make_pair(9200-5800, 50);
-    profitAndTime[4] = make_pair(22500-15400, 500);
-    profitAndTime[5] = make_pair(25000-17200, 500);
-    profitAndTime[6] = make_pair(27500-19200, 500);
-    profitAndTime[7] = make_pair(105000-76000, 1000);
+    profitAndTime[0] = make_pair(make_pair(0,0), INF);
+    profitAndTime[1] = make_pair(make_pair(6000,3000), 50);
+    profitAndTime[2] = make_pair(make_pair(7600,4400), 50);
+    profitAndTime[3] = make_pair(make_pair(9200,5800), 50);
+    profitAndTime[4] = make_pair(make_pair(22500,15400), 500);
+    profitAndTime[5] = make_pair(make_pair(25000,17200), 500);
+    profitAndTime[6] = make_pair(make_pair(27500,19200), 500);
+    profitAndTime[7] = make_pair(make_pair(105000,76000), 1000);
     // 初始化 type2BuyIndex，为收购方建立索引
     for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
         switch (wb[wbIdx].type) {

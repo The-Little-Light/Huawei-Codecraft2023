@@ -1,9 +1,10 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-21 21:27:39
+ * @LastEditTime: 2023-03-22 15:51:07
  * @LastEditors: Xzh
  * @Description: 
+ *      引入最小费用最大流对进行全局任务规划，优化任务分配
  */
 
 #include "solution.hpp"
@@ -19,14 +20,14 @@ void mcmf::init(){
 
     vector<int> index;      //与T相连的工作台
 
-    // 为原料格加点加点+维护index数组
-    auto setID = [&](int &pst,int wbIdx,int value = inf){
+    // 为原料格加点加边+维护index数组
+    auto setID = [&](int &pst,int wbIdx,int cap = inf){
         pst = getNode();
-        addEdge(pst,T,0,value);
+        addEdge(pst,T,0,cap);
         index.push_back(pst);
         ProductId2Workbench[pst] = wbIdx;
     };
-
+    // 建立原料格对汇点的边
     for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
         switch (wb[wbIdx].type) {
         case 7:
@@ -45,7 +46,7 @@ void mcmf::init(){
             break;
         }
     }
-
+    // 建立产品型号到收购方原材料格id的映射
     for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
         switch (wb[wbIdx].type) {
         case 4:
@@ -78,8 +79,6 @@ void mcmf::init(){
         }
     }
 
-
-
     // 初始化空闲产品节点池
     if (cnt&1) getNode();
     for (; curSize < poolSize; curSize++) {
@@ -93,28 +92,26 @@ void mcmf::init(){
     }
 }
 
-//TODO 静态价值参数调整
+//静态价值参数调整
 double mcmf::countValue(int proType,int startIndex,int endIndex) {
     coordinate s = wb[startIndex].location;
     coordinate e = wb[endIndex].location;
     double dd = dis(s, e);                  // 机器人从起点到终点的距离
     vec s2e(e.x - s.x, e.y - s.y);          // 起点到终点的向量
-    double tt = dd/6;
-    // estFrame = tt * 50 + 50;
-
-    double vv = profitAndTime[proType].first;
+    double tt = dd/6 + 1;
+    double vv = profitAndTime[proType].first.first; // 出售收入
+    double nextVv = profitAndTime[wb[endIndex].type].first.first - profitAndTime[wb[endIndex].type].first.second;
     // 考虑剩余原材料格对价值的影响，目标工作台的剩余材料格越少越重视
     if (wb[endIndex].type > 7) {
         vv *= 0.8;
     }
     else if (wb[endIndex].type == 7) {
-        vv += 0.35*profitAndTime[wb[endIndex].type].first/(3-wb[endIndex].rawMaterNum());
+        vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
     }
     else if (wb[endIndex].type > 3) {
-        vv += 0.35*profitAndTime[wb[endIndex].type].first/(2-wb[endIndex].rawMaterNum());
+        vv += 0.35*nextVv/(2-wb[endIndex].rawMaterNum());
     }
-    //TODO related about tt and vv
-    return  - ( para2 * vv) + inf;
+    return  - ( para2 * vv + para1 / tt) + inf;
 }
 
 //TODO is it can merge with above function
@@ -122,24 +119,24 @@ double mcmf::countSellValue(int proType,int rtIdx,int endIndex){
     coordinate s = rt[rtIdx].location;
     coordinate e = wb[endIndex].location;
     
-    double dd = dis(s, e);                     // 机器人到终点的距离
-    vec s2e(e.x - s.x, e.y - s.y);          // 起点到终点的向量
-    double rr = cntAngle(rt[rtIdx].lsp, s2e); // 任务所需转动角度和
-    double tt = dd/6 + rr/PI;
-    double vv = profitAndTime[proType].first;
+    double dd = dis(s, e);                      // 机器人到终点的距离
+    vec s2e(e.x - s.x, e.y - s.y);              // 起点到终点的向量
+    double rr = cntAngle(rt[rtIdx].lsp, s2e);   // 任务所需转动角度和
+    double tt = dd/6 + rr/PI + 1;
+    double vv = profitAndTime[proType].first.first; // 出售收入
+    double nextVv = profitAndTime[wb[endIndex].type].first.first - profitAndTime[wb[endIndex].type].first.second;
 
     // 考虑剩余原材料格对价值的影响，目标工作台的剩余材料格越少越重视
     if (wb[endIndex].type > 7) {
         vv *= 0.8;
     }
     else if (wb[endIndex].type == 7) {
-        vv += 0.35*profitAndTime[wb[endIndex].type].first/(3-wb[endIndex].rawMaterNum());
+        vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
     }
     else if (wb[endIndex].type > 3) {
-        vv += 0.35*profitAndTime[wb[endIndex].type].first/(2-wb[endIndex].rawMaterNum());
+        vv += 0.35*nextVv/(2-wb[endIndex].rawMaterNum());
     }
-    //TODO related about tt and vv
-    return - (para2 * vv) + inf;
+    return  - ( para2 * vv + para1 / tt) + inf;
 }
 
 double mcmf::countBuyValue(int proType,int rtIdx,int endIndex) {
@@ -148,10 +145,12 @@ double mcmf::countBuyValue(int proType,int rtIdx,int endIndex) {
     double dd = dis(s, e);                    // 机器人到终点的距离
     vec s2e(e.x - s.x, e.y - s.y);            // 机器人到终点的向量
     double rr = cntAngle(rt[rtIdx].lsp, s2e); // 任务所需转动角度和
-    double tt = dd/6 + rr/PI;
-    double vv = profitAndTime[proType].first + inf * 2;
-
-    return  para2 * vv + inf;
+    double tt = dd/6 + rr/PI + 1;
+    // double vv = -profitAndTime[proType].first.second; // 已购入支出
+    int nextPro = wb[endIndex].type;
+    // vv -= -profitAndTime[nextPro].first.second; // 先预计购入支出
+    if (proType != 0) return INF*2;
+    return  -(para1 / tt) + inf;
 }
 
 
@@ -252,7 +251,7 @@ void mcmf::showNodeEdge(int id, int condition) {
 
 void mcmf::showFlow(int condition,int detailed) {
     if (condition) {
-        fprintf(stderr,"\n");
+        fprintf(stderr,"frameID : %d \n",frameID);
         for (int i = 0; i < bufCur; i++){
             int index = 0,pe,pv;
             fprintf(stderr,"%d ",T);
@@ -313,13 +312,14 @@ void mcmf::lockNode(int rtIdx,int wbIdx){
 
 void mcmf::adjustEdge(int rtIdx){
     int id = robotId[rtIdx];
-    edge&tmp = G[id][0];
+    edge&tmp = G[id][0]; // robot to S
     tmp.cap = 0,G[S][tmp.rev].cap = 1;
 
     int nodeId = rt[rtIdx].nodeId,type = rt[rtIdx].pd_id;
     for (int i = 1,size = G[id].size(); i < size; i++) {
         edge&ed = G[id][i];
         if (ed.to != nodeId) {
+            if (!ed.cap) continue;
             ed.cost = countBuyValue(type,rtIdx,ProductId2Workbench[ed.to]);
             G[ed.to][ed.rev].cost = -ed.cost;
             // if (nodeId < 0) ed.cap = 1,G[tmp.to][tmp.rev].cap = 0;
@@ -336,7 +336,6 @@ void mcmf::adjustEdge(int rtIdx){
         G[nodeId][N].cap = 1;
         nodeId ^= 1;
         G[nodeId][0].cap = 0;
-
         
         for (int index = 1,size = G[nodeId].size(); index < size; index++) {
             edge &tmp = G[nodeId][index];
@@ -348,6 +347,22 @@ void mcmf::adjustEdge(int rtIdx){
             }
         }
     } 
+}
+
+/**
+ *return value : 
+ *   0 when a is normal value;
+ *   1 when a is NaN;
+ *   0 when a is inf;
+ */
+int mcmf::checkVaild(double a) {
+    if (isnan(a)) {
+        return 1;
+    } else if (isinf(a)) {
+        return 2;
+    } else {
+        return 0;
+    }
 }
 
 void mcmf::adjustTask(int rtIdx){
@@ -368,13 +383,56 @@ void mcmf::adjustTask(int rtIdx){
                 }
             }
         } else {
-            cerr << "destroyed " <<rtIdx<< endl;
-            for (int i = 0,size = G[id].size(); i < size; i++) {
-                edge&ed = G[id][i];
-                if (G[ed.to][ed.rev].cap) {
-                    fprintf(stderr," %d %d %d -------> %d %d\n",id,i,ed.cap,ed.to,G[ed.to][ed.rev].cap);
+            cerr << "destroyed " <<rtIdx << "  curframeID " <<frameID<< endl;
+            int debugLevel = 1;    // 调试级别 0不输出报错信息,1表示简略的报错信息，2是详细的报错信息。
+            int errorType = 0;
+
+            if (debugLevel) {
+                auto check = [&](int id) -> int {
+                    int flag = 0;
+                    for (int i = 0,size = G[id].size(); i < size; i++) {
+                        edge&ed = G[id][i];
+                        if (G[ed.to][ed.rev].cap || ed.cap) {
+                            if (debugLevel > 1)
+                            fprintf(stderr,"%d %d %d -------> %d %d %f %f\n",id,i,ed.cap,ed.to,G[ed.to][ed.rev].cap,ed.cost,G[ed.to][ed.rev].cost);
+                            flag |= checkVaild(ed.cost);
+                        }
+                    }
+                    if (debugLevel > 1) cerr << endl;
+                    errorType |= flag;
+                    return flag;
+                };
+
+                auto printError = [&](const char *pre,int flag) {
+                    if (flag & 1) fprintf(stderr,"%s   NaN checked\n",pre);
+                    if (flag & 2) fprintf(stderr,"%s   inf checked\n",pre);       
+                    if (flag & 4) fprintf(stderr,"%s   Unknown Error\n",pre);       
+                };
+
+                printError("countBuyValue",check(id));
+
+                cerr << "nodeId "<<nodeId << endl;
+                check(nodeId);
+
+                int tmpId = nodeId ^ 1;
+                printError("countSellValue",check(tmpId));
+
+
+                vector<int> de;
+                for (int i = 0,size = G[tmpId].size(); i < size; i++) {
+                    edge&ed = G[tmpId][i];
+                    if (ed.cap) de.push_back(ed.to);
                 }
+
+                for (auto id : de) {
+                    check(id);
+                    printError("countSellValue | countValue",check(id));
+                }
+
+                if (!errorType) printError("",4);
+                cerr << endl;
             }
+            
             // TODO if this situation happen,this solution
         }
     } else {
@@ -398,11 +456,11 @@ void mcmf::checkDest(int rtIdx) {
             bot.haveTemDest = false;
         }
     } else {
-        if (bot.curTask.checkVaild()) {
+        if (bot.curTask.destId != -1) {
             if (bot.wb_id == bot.curTask.destId) {
                 // 到达当前工作目的地，交付工作
-                bot.cmd.buy = bot.curTask.buy;
                 bot.cmd.sell = bot.curTask.sell;
+                bot.cmd.buy = bot.curTask.buy;
                 
                 if (bot.cmd.sell) {
                     if (wb[bot.wb_id].type < 8) {
@@ -438,7 +496,6 @@ void mcmf::checkDest(int rtIdx) {
 
 void mcmf::solution() {
     // 检查工作台状态
-
     //TODO parallel
     for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
         if (wb[wbIdx].pstatus) {
@@ -471,7 +528,6 @@ void mcmf::solution() {
         }
     }
 
-
     //TODO parallel
     // 检查机器人运动状态
     for (int rtIdx = 0; rtIdx < N; ++rtIdx) {
@@ -502,8 +558,16 @@ void mcmf::solution() {
     // 碰撞避免
     collitionAvoidance();
 
-    // curFlow.showFlow();
+    auto printError = [&]() {
+        if (curFlow.flow != N && frameID >= 50) {
+            fprintf(stderr, "flow Error curframeID : %d\n\n",frameID);
+        }
+    };
+
+    // curFlow.showFlow(frameID >= 1000 && frameID <= 1500);
     // curFlow.showNodeEdge(curFlow.T);
+    printError();
+
     curFlow.resetCap();
     return;
 }

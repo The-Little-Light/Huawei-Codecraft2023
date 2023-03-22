@@ -10,16 +10,17 @@ void misson::countValue(coordinate& rtCo, int proType, vec& lsp) {
     double rr = cntAngle(lsp, r2s) + cntAngle(r2s, s2e); // 任务所需转动角度和
     double tt = dd/6 + rr/PI;
     estFrame = tt * 50 + 50;
-    double vv = profitAndTime[proType].first;
+    double vv = profitAndTime[proType].first.first - profitAndTime[proType].first.second;
+    double nextVv = profitAndTime[wb[endIndex].type].first.first - profitAndTime[wb[endIndex].type].first.second;
     // 考虑剩余原材料格对价值的影响，目标工作台的剩余材料格越少越重视
     if (wb[endIndex].type > 7) {
         vv *= 0.8;
     }
     else if (wb[endIndex].type == 7) {
-        vv += 0.35*profitAndTime[wb[endIndex].type].first/(3-wb[endIndex].rawMaterNum());
+        vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
     }
     else if (wb[endIndex].type > 3) {
-        vv += 0.35*profitAndTime[wb[endIndex].type].first/(2-wb[endIndex].rawMaterNum());
+        vv += 0.35*nextVv/(2-wb[endIndex].rawMaterNum());
     }
     v = para1 / tt + para2 * vv;
 } 
