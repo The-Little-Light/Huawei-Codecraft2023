@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-22 15:51:07
+ * @LastEditTime: 2023-03-22 19:01:19
  * @LastEditors: Xzh
  * @Description: 
  *      引入最小费用最大流对进行全局任务规划，优化任务分配
@@ -423,11 +423,18 @@ void mcmf::adjustTask(int rtIdx){
                 }
 
                 for (auto id : de) {
-                    check(id);
                     printError("countSellValue | countValue",check(id));
                 }
 
                 if (!errorType) printError("",4);
+                // showNodeEdge(T);
+                
+                // for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
+                //     int rstatus = wb[wbIdx].rstatus;
+                //     fprintf(stderr," wbIdx : %d  rstatus : %d\n", wbIdx, rstatus);
+                // }
+
+                curFlow.showFlow();
                 cerr << endl;
             }
             
@@ -564,7 +571,7 @@ void mcmf::solution() {
 
     // curFlow.showFlow(frameID >= 1000 && frameID <= 1500);
     // curFlow.showNodeEdge(curFlow.T);
-    printError();
+    // printError();
 
     curFlow.resetCap();
     return;
