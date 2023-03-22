@@ -147,8 +147,8 @@ struct robot {
 struct mcmf {
     
     const double eps = 1e-6;
-    const double para1 = 950000;
-    const double para2 = 7;
+    const double para1 = 95000;
+    const double para2 = 0.7;
 
 
     int S, T;
@@ -205,7 +205,7 @@ struct mcmf {
     int solve();                        // 基于spfa计算最小费用流
 
     void releaseNode(int id);           // 将某个节点移入空闲节点池
-    void lockNode(int rtIdx,int wbIdx);           // 工作台产品被机器人获取
+    void lockNode(int rtIdx,int wbIdx); // 工作台产品被机器人获取
     void allocateNode(int wbIdx);       // 为工作台产品分配节点
 
     void adjustEdge(int rtIdx);         // 每帧开始时为机器人调整边权
@@ -237,17 +237,17 @@ extern int curMoney;                  // 当前金钱
 extern robot rt[ROBOT_SIZE];          // 机器人
 extern workbench wb[WORKBENCH_SIZE];  // 工作台
 extern char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
-extern int collisionNum[ROBOT_SIZE];   // 碰撞次数
-extern int buyNum[8][ROBOT_SIZE];      // 物品的购买次数
-extern int sellNum[8][ROBOT_SIZE];     // 物品的出售次数
-extern const double PI;                     // 圆周率
+extern int collisionNum[ROBOT_SIZE];  // 碰撞次数
+extern int buyNum[8][ROBOT_SIZE];     // 物品的购买次数
+extern int sellNum[8][ROBOT_SIZE];    // 物品的出售次数
+extern const double PI;               // 圆周率
 extern mcmf curFlow;                  // 网络流实例
 extern ofstream fout;                 // 与日志文件关联的输出流
 
 
 extern map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 
-extern pair<int,int> profitAndTime[8];
+extern pair<pair<int,int>,int> profitAndTime[8];
 
 extern double dis(coordinate& c1, coordinate& c2);
 extern double crossProduct(vec& a, vec& b);
