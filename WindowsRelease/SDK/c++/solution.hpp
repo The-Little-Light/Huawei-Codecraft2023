@@ -141,7 +141,6 @@ struct robot {
     int nodeId = -1;
 
     void checkDest();
-    void MCMFcheckDest();
     void checkTask();
     void checkSpeed();
     void findMission(vector<misson>&, coordinate&, vec&);
