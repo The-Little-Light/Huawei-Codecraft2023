@@ -31,7 +31,7 @@ double dis(coordinate& c1, coordinate& c2) {
 
 // 计算两个向量的夹角
 double cntAngle(vec& a, vec& b){
-    double angleDiff = acos(min(1.0, dotProduct(a, b) / (modulusOfVector(a)*modulusOfVector(b))));
+    double angleDiff = acos(max(-1.0,min(1.0, dotProduct(a, b) / (modulusOfVector(a)*modulusOfVector(b)))));
     if (isnan(angleDiff)) {
         double dp = dotProduct(a, b);
         double mxm = modulusOfVector(a)*modulusOfVector(b);
