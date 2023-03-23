@@ -192,6 +192,7 @@ struct mcmf {
     int vis[maxNode];                        // 顶点是否在队列中
     int pre[maxNode];                        // 最短路上的前驱节点
     int pe[maxNode];                         // 最短路上的前驱边
+    int leftTime[maxNode];                   // 剩于生产时间
     int stateBuf[ROBOT_SIZE][ROBOT_SIZE * 15][2];// 用于权值回退
     int bufCur = 0;                          // 已使用的Buf数
     int flow = 0;

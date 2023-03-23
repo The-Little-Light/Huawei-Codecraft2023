@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-23 03:43:15
+ * @LastEditTime: 2023-03-23 23:35:47
  * @LastEditors: Xzh
  * @Description: 
  *      引入最小费用最大流进行全局任务规划，优化任务分配
@@ -181,6 +181,10 @@ void mcmf::allocateNode(int wbIdx){
 
         }
     }
+    int id = workbenchId[wbIdx];
+    int tmpTime = wb[wbIdx].rtime;
+    if (tmpTime < 0 || wb[wbIdx].pstatus) tmpTime = 0;
+    leftTime[id] = leftTime[id ^ 1] = tmpTime;
 }
 
 int mcmf::spfa(){
@@ -466,7 +470,7 @@ void mcmf::checkDest(int rtIdx) {
             if (bot.wb_id == bot.curTask.destId) {
                 // 到达当前工作目的地，交付工作
                 bot.cmd.sell = bot.curTask.sell;
-                bot.cmd.buy = bot.curTask.buy;
+                if (!leftTime[workbenchId[bot.wb_id]]) bot.cmd.buy = bot.curTask.buy;
                 
                 if (bot.cmd.sell) {
                     if (wb[bot.wb_id].type < 8) {
@@ -491,9 +495,11 @@ void mcmf::checkDest(int rtIdx) {
                     releaseNode(bot.nodeId); 
                     bot.nodeId = -1,bot.pd_id = 0;
                 } else {
-                    // TODO: assume robot must buy material here,is it not realistic
-                    lockNode(rtIdx,bot.wb_id);
-                    bot.pd_id = wb[bot.wb_id].type;
+                    if (!leftTime[workbenchId[bot.wb_id]]) {
+                        // TODO: assume robot must buy material here,is it not realistic
+                        lockNode(rtIdx,bot.wb_id);
+                        bot.pd_id = wb[bot.wb_id].type;
+                    }
                 }
                 bot.curTask.destId = -1;
             }
@@ -505,7 +511,7 @@ void mcmf::solution() {
     // 检查工作台状态
     //TODO parallel
     for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
-        if (wb[wbIdx].pstatus) {
+        if (wb[wbIdx].pstatus || wb[wbIdx].rtime >= 0) {
             allocateNode(wbIdx);
         }
         int rstatus = wb[wbIdx].rstatus;
