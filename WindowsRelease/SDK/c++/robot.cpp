@@ -10,6 +10,9 @@ void robot::collisionCount() {
 
 // 统计购买与出售次数
 void robot::buysellCount() {
+    if (taskQueue.size()) {
+        curTask = taskQueue.front();
+    }
     if (!haveTemDest && wb_id == curTask.destId && curTask.destId != -1) {
         if (curTask.buy)   ++buyNum[wb[wb_id].type];
         if (curTask.sell)  ++sellNum[pd_id];

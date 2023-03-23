@@ -4,12 +4,15 @@
 *.exe
 *.json
 *.zip
-result.txt
+*.rep
+*.sh
+*.ps1
 
 #忽略test.cpp
 test.cpp
 mergeMain.sh
 log.txt
+result.txt
 
 #忽略cmake的临时文件
 build/
