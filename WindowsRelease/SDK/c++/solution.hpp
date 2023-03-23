@@ -113,12 +113,9 @@ struct robot {
     coordinate location;
     command cmd;  // 当前帧要发布的控制指令
     int collisionNum;  // 碰撞次数
+    int item;          // 当前帧产品类型
     int buyNum[8];     // 物品的购买次数
     int sellNum[8];    // 物品的出售次数
-    void initLog() {
-        memset(buyNum, 0, sizeof(buyNum));
-        memset(sellNum, 0, sizeof(sellNum));
-    }
     void setSpeed(coordinate dest); // 负责从当前位置移动到目的地的线速度和角速度指令
 
     queue<task> taskQueue; // 任务队列

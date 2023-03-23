@@ -11,7 +11,7 @@ void robot::collisionCount() {
 // 统计购买与出售次数
 void robot::buysellCount() {
     if (cmd.buy)   ++buyNum[wb[wb_id].type];
-    if (cmd.sell)  ++sellNum[wb[wb_id].type];
+    if (cmd.sell)  ++sellNum[item];
 }
 
 // 设置临时目的地

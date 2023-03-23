@@ -36,7 +36,6 @@ void init() {
     fout.open("log.txt", ios_base::app);
     for (int i = 0; i < ROBOT_SIZE; ++i) {
         rt[i].rtIdx = i+1;
-        rt[i].initLog();
     }
     profitAndTime[0] = make_pair(make_pair(0,0), INF);
     profitAndTime[1] = make_pair(make_pair(6000,3000), 50);
