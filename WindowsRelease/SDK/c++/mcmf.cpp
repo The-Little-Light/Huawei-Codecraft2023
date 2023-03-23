@@ -112,7 +112,7 @@ double mcmf::countValue(int proType,int startIndex,int endIndex) {
     else if (wb[endIndex].type > 3) {
         vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
     }
-    return  - ( para2 * vv + para1 / tt) + inf;
+    return  - ( para2 * vv + para1 * tt) + inf;
 }
 
 //TODO is it can merge with above function
@@ -136,21 +136,23 @@ double mcmf::countSellValue(int proType,int rtIdx,int endIndex){
     else if (wb[endIndex].type > 3) {
         vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
     }
-    return  - ( para2 * vv + para1 / tt) + inf;
+    return  - ( para2 * vv + para1 * tt) + inf;
 }
 
 double mcmf::countBuyValue(int proType,int rtIdx,int endIndex) {
     coordinate s = rt[rtIdx].location;
     coordinate e = wb[endIndex].location;
+    int left = leftTime[workbenchId[endIndex]]; // 剩余生产时间
     double dd = dis(s, e);                    // 机器人到终点的距离
     vec s2e(e.x - s.x, e.y - s.y);            // 机器人到终点的向量
     double rr = cntAngle(rt[rtIdx].lsp, s2e); // 任务所需转动角度和
     double tt = dd/6 + rr/PI + 1;
+    double estFrame = tt * 50;
     // double vv = -profitAndTime[proType].first.second; // 已购入支出
     int nextPro = wb[endIndex].type;
     // vv -= -profitAndTime[nextPro].first.second; // 先预计购入支出
     if (proType != 0) return INF*2;
-    return  -(para1 / tt) + inf;
+    return  -(para1 * tt) + inf + max(0.0, left - estFrame) * INF;
 }
 
 
