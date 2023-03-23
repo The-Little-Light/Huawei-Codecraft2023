@@ -115,6 +115,10 @@ struct robot {
     int collisionNum;  // 碰撞次数
     int buyNum[8];     // 物品的购买次数
     int sellNum[8];    // 物品的出售次数
+    void initLog() {
+        memset(buyNum, 0, sizeof(buyNum));
+        memset(sellNum, 0, sizeof(sellNum));
+    }
     void setSpeed(coordinate dest); // 负责从当前位置移动到目的地的线速度和角速度指令
 
     queue<task> taskQueue; // 任务队列
@@ -147,8 +151,8 @@ struct robot {
 struct mcmf {
     
     const double eps = 1e-6;
-    const double para1 = 95000;
-    const double para2 = 0.7;
+    const double para1 = -45000;
+    const double para2 = 4;
 
 
     int S, T;
