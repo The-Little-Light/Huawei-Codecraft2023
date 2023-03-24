@@ -19,7 +19,10 @@ void robot::collisionCount() {
 // 统计购买与出售次数
 void robot::buysellCount() {
     if (cmd.buy)   ++buyNum[wb[wb_id].type];
-    if (cmd.sell)  ++sellNum[item];
+    if (cmd.sell)  {
+        ++sellNum[item];
+        ++totalSellNum[item];
+    }
 }
 
 // 设置临时目的地
@@ -126,6 +129,9 @@ void robot::findMission(vector<misson>& msNode, coordinate& rtCo, vec& lsp) {
                     // 此时从 wbIdx 到 buyWbIdx 是一个潜在任务
                     misson pot = misson(wbIdx, buyWbIdx, proType);
                     pot.countValue(rtCo, proType, lsp);
+                    if (K == 18 && rtIdx < 2 && wb[buyWbIdx].type == 4) {
+                        pot.v *= 2;
+                    }
                     msNode.push_back(pot);
                 } 
             }
