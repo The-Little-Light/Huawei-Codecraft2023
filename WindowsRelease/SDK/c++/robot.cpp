@@ -126,6 +126,9 @@ void robot::findMission(vector<misson>& msNode, coordinate& rtCo, vec& lsp) {
                     // 此时从 wbIdx 到 buyWbIdx 是一个潜在任务
                     misson pot = misson(wbIdx, buyWbIdx, proType);
                     pot.countValue(rtCo, proType, lsp);
+                    if (K == 18 && rtIdx < 2 && wb[buyWbIdx].type == 4) {
+                        pot.v *= 2;
+                    }
                     msNode.push_back(pot);
                 } 
             }

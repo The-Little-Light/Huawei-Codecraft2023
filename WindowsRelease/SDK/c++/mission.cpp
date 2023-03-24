@@ -17,10 +17,10 @@ void misson::countValue(coordinate& rtCo, int proType, vec& lsp) {
         vv *= 0.8;
     }
     else if (wb[endIndex].type == 7) {
-        vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
+        vv += para4*nextVv/(3-wb[endIndex].rawMaterNum());
     }
     else if (wb[endIndex].type > 3) {
-        vv += 0.35*nextVv/(2-wb[endIndex].rawMaterNum());
+        vv += para4*nextVv/(2-wb[endIndex].rawMaterNum());
     }
     v = para1 / tt + para2 * vv;
 } 

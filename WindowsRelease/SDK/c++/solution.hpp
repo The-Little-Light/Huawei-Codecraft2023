@@ -6,7 +6,7 @@
 #define WORKBENCH_SIZE 50
 #define ROBOT_SIZE 4
 #define DEBUG
-#define ESTIMATE
+// #define ESTIMATE
 //TODO polish
 #define poolSize  WORKBENCH_SIZE * 6    //产品池大小
 #define maxNode  WORKBENCH_SIZE * 4 + ROBOT_SIZE * 2 + poolSize * 2 
@@ -90,8 +90,6 @@ struct misson {
     double v = 0;   // 价值函数
     double estFrame = 0; // 估计任务消耗帧数
     
-    double para1 = 950000;
-    double para2 = 7;
     misson(int s, int e, int p) {
         startIndex = s;
         endIndex = e;
@@ -150,8 +148,8 @@ struct robot {
 struct mcmf {
     
     const double eps = 1e-6;
-    const double para1 = -45000; // 时间相关系数
-    const double para2 = 5;    // 价值相关系数
+    double para1 = -45000; // 时间相关系数
+    double para2 = 5;    // 价值相关系数
 
 
     int S, T;
@@ -249,6 +247,9 @@ extern const double PI;               // 圆周率
 extern mcmf curFlow;                  // 网络流实例
 extern ofstream fout;                 // 与日志文件关联的输出流
 
+    extern double para1;
+    extern double para2;
+    extern double para4;
 
 extern map<int, vector<int>> type2BuyIndex; // 根据产品类型寻找收购方下标
 

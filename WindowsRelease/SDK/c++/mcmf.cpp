@@ -105,12 +105,14 @@ double mcmf::countValue(int proType,int startIndex,int endIndex) {
     // 考虑剩余原材料格对价值的影响，目标工作台的剩余材料格越少越重视
     if (wb[endIndex].type > 7) {
         vv *= 0.8;
+        if (frameID >= 7500) return 2*INF;
     }
     else if (wb[endIndex].type == 7) {
-        vv += 0.35*nextVv/(4-wb[endIndex].rawMaterNum());
+        vv += 0.3*nextVv/(4-wb[endIndex].rawMaterNum());
+        if (frameID >= 7500 && proType == 6) return INF;
     }
     else if (wb[endIndex].type > 3) {
-        vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
+        vv += 0.3*nextVv/(3-wb[endIndex].rawMaterNum());
     }
     return  - ( para2 * vv + para1 * tt) + inf;
 }
@@ -131,11 +133,14 @@ double mcmf::countSellValue(int proType,int rtIdx,int endIndex){
         vv *= 0.8;
     }
     else if (wb[endIndex].type == 7) {
-        vv += 0.35*nextVv/(4-wb[endIndex].rawMaterNum());
+        vv += 0.3*nextVv/(4-wb[endIndex].rawMaterNum());
     }
     else if (wb[endIndex].type > 3) {
-        vv += 0.35*nextVv/(3-wb[endIndex].rawMaterNum());
+        vv += 0.3*nextVv/(3-wb[endIndex].rawMaterNum());
     }
+    int nextPro = wb[endIndex].type;
+    if (rtIdx == 1 && nextPro == 6)  vv *= 3;
+    if (rtIdx == 2 && nextPro == 6)  vv *= 3;
     return  - ( para2 * vv + para1 * tt) + inf;
 }
 
