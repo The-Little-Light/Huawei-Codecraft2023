@@ -5,7 +5,7 @@
 #define MAP_SIZE 100
 #define WORKBENCH_SIZE 50
 #define ROBOT_SIZE 4
-// #define DEBUG
+#define DEBUG
 //TODO polish
 #define poolSize  WORKBENCH_SIZE * 6    //产品池大小
 #define maxNode  WORKBENCH_SIZE * 4 + ROBOT_SIZE * 2 + poolSize * 2 

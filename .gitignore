@@ -16,5 +16,6 @@ result.txt
 
 #忽略cmake的临时文件
 build/
+maps/
 replay/
 result/

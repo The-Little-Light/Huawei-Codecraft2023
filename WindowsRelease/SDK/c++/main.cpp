@@ -119,6 +119,9 @@ void readInfo() {
             &rt[i].toward,
             &x, &y // location
         ); rt[i].location.set(x, y);
+        #ifdef DEBUG
+        rt[i].item = rt[i].pd_id;
+        #endif
     }
     getchar();
     fgets(line, sizeof line, stdin); // receive OK
