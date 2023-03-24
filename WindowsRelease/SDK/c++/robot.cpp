@@ -44,9 +44,17 @@ void robot::checkDest() {
             task& curTask = taskQueue.front();
             if (wb_id == curTask.destId) {
                 // 到达当前工作目的地，交付工作
-                cmd.buy = curTask.buy;
-                cmd.sell = curTask.sell;
-                taskQueue.pop();
+                if (curTask.buy && wb[wb_id].pstatus) {
+                    // 到达生产工作台
+                    cmd.buy = true;
+                    wb[wb_id].reachable = true;     // 该生产工作台可达
+                    taskQueue.pop();
+                }
+                if (curTask.sell) {
+                    // 达到消耗工作台
+                    cmd.sell = true;
+                    taskQueue.pop();
+                }              
             }
         }
     }
@@ -61,13 +69,17 @@ void robot::checkTask() {
         bool success = false;
         for (int i = 0; i < msNode.size(); ++i) {
             misson selected = msNode[i];
-            // 预计任务能在第9000帧之前完成才接单
+            // 预计到达生产工作台时已有产品生成且预计任务能在第9000帧之前完成才接单
             // cerr << "robot" << rtIdx << ": " << frameID << "   " << selected.estFrame + frameID << endl;
-            if (selected.estFrame + frameID < 9000) {
+            #ifdef ESTIMATE
+            if ((wb[selected.startIndex].pstatus || selected.estFrame >= wb[selected.startIndex].rtime) && (selected.estFrame + frameID < 9000)) {
+            #else
+            if (wb[selected.startIndex].pstatus && (selected.estFrame + frameID < 9000)) {
+            #endif
                 curMission = selected;
                 taskQueue.push(task(wb[selected.startIndex].location ,selected.startIndex, 1, 0));
                 taskQueue.push(task(wb[selected.endIndex].location ,selected.endIndex, 0, 1));
-                wb[curMission.startIndex].pstatus = 0;
+                wb[selected.startIndex].reachable = false;    // 该生产工作台不可达
                 wb[curMission.endIndex].setProType(curMission.proType);
                 success = true;
                 break;
@@ -100,8 +112,12 @@ bool cmp (misson& a, misson& b) {
 
 void robot::findMission(vector<misson>& msNode, coordinate& rtCo, vec& lsp) {
     for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
-        // 寻找有现成产品的工作台
-        if (wb[wbIdx].pstatus) {
+        // 寻找有现成产品或正在生产中的可达生产工作台
+        #ifdef ESTIMATE
+        if (wb[wbIdx].reachable && (wb[wbIdx].pstatus || wb[wbIdx].rtime>=0)) {
+        #else 
+        if (wb[wbIdx].reachable && wb[wbIdx].pstatus) {
+        #endif
             int proType = wb[wbIdx].type;
             // 遍历收购方
             for (auto buyWbIdx: type2BuyIndex[proType]) {

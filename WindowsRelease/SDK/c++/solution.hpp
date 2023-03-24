@@ -6,6 +6,7 @@
 #define WORKBENCH_SIZE 50
 #define ROBOT_SIZE 4
 #define DEBUG
+#define ESTIMATE
 //TODO polish
 #define poolSize  WORKBENCH_SIZE * 6    //产品池大小
 #define maxNode  WORKBENCH_SIZE * 4 + ROBOT_SIZE * 2 + poolSize * 2 
@@ -22,11 +23,12 @@ struct coordinate {
 };
 
 struct workbench {
-    int type;    // 工作台类型 
+    int type;       // 工作台类型 
     coordinate location;
-    int rtime;   // 剩余生产时间 Remaining production time
-    int rstatus; // 原材料格状态 Raw—material status
-    int pstatus; // 产品格状态   Product status
+    int rtime;      // 剩余生产时间 Remaining production time
+    int rstatus;    // 原材料格状态 Raw—material status
+    int pstatus;    // 产品格状态   Product status
+    bool reachable; // 可达标志，记录是否有机器人选取该工作台作为购买目标
 
     // 判断原材料proType型号格是否为空，空返回false
     bool checkHaveProType(int proType) {
@@ -56,7 +58,7 @@ struct command { // 汇总当前帧机器人的控制指令
     bool buy = false;
     bool sell = false;
     bool destroy = false;
-    void clean() {
+    inline void clean() {
         buy = sell = destroy = false;
     }
 };
