@@ -32,10 +32,12 @@ void init() {
             if(plat[i][j] == 'A') N++;
         }
     }
-    // 检测平台log
-    fout.open("log.txt", ios_base::app);
+    // # ifdef DEBUG
+    // // 检测平台log
+    // fout.open("log.txt", ios_base::app);
+    // # endif
     for (int i = 0; i < ROBOT_SIZE; ++i) {
-        rt[i].rtIdx = i+1;
+        rt[i].rtIdx = i;
     }
     profitAndTime[0] = make_pair(make_pair(0,0), INF);
     profitAndTime[1] = make_pair(make_pair(6000,3000), 50);
@@ -171,9 +173,11 @@ int main() {
         curFlow.solution();
         /**************/
         for(int robotId = 0; robotId < ROBOT_SIZE; robotId++){  
-            // 各个机器人统计是否产生碰撞、购买、出售等行为       
-            rt[robotId].collisionCount();
-            rt[robotId].buysellCount();
+            // # ifdef DEBUG
+            // // 各个机器人统计是否产生碰撞、购买、出售等行为       
+            // rt[robotId].collisionCount();
+            // rt[robotId].buysellCount();
+            // # endif
             // 输出交互指令
             printRobotCommand(robotId);
         }
@@ -182,7 +186,9 @@ int main() {
         fflush(stdout);
     }
 
-    printLog();
+    // # ifdef DEBUG
+    // printLog();
+    // # endif
 
     return 0;
 }
