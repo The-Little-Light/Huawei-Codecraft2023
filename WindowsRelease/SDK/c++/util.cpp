@@ -8,10 +8,17 @@ void printLog() {
     fout << setw(8) << "TOTAL";
 
     int sum = 0;
-    fout << endl << setw(15) << "COLLOSION:";
+    fout << endl << setw(15) << "WALL COLLOSION:";
     for (int i = 0; i < ROBOT_SIZE; ++i) {
-        fout << setw(8) << rt[i].collisionNum;
-        sum += rt[i].collisionNum;
+        fout << setw(8) << rt[i].wallCollisionNum;
+        sum += rt[i].wallCollisionNum;
+    }   
+    fout << setw(8) << sum;
+    sum = 0;
+    fout << endl << setw(15) << "ROBO COLLOSION:";
+    for (int i = 0; i < ROBOT_SIZE; ++i) {
+        fout << setw(8) << rt[i].roboCollisionNum;
+        sum += rt[i].roboCollisionNum;
     }   
     fout << setw(8) << sum;
     

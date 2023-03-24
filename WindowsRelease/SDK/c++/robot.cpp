@@ -3,8 +3,16 @@
 // 统计碰撞次数
 void robot::collisionCount() {    
     if ((pcvc - cvc >= 0.001) && (cvc > 0.79)) {
-        // fout << frameID << "(" << "robot" << rtIdx << ")" << ": " << pcvc << " -> " << cvc << endl;
-        ++collisionNum;
+        double robotRadius = 0.45; // 机器人半径
+        if (taskQueue.size() == 1) {
+            robotRadius = 0.53;
+        }
+        robotRadius += 0.1;
+        // 判断碰撞原因
+        if (fabs(location.x) <= robotRadius || fabs(location.x - 50.0) <= robotRadius || fabs(location.y) <= robotRadius || fabs(location.y - 50.0) <= robotRadius) {
+            ++wallCollisionNum;
+        }
+        else ++roboCollisionNum;
     }
 }
 
