@@ -28,7 +28,10 @@ void init() {
     K = 0;
     for(int i = 0; i < MAP_SIZE; ++i){
         for(int j = 0; j < MAP_SIZE; ++j){
-            if(isdigit(plat[i][j])) wb[K++].type = plat[i][j] - '0';
+            if(isdigit(plat[i][j])) {
+                wb[K].type = plat[i][j] - '0';
+                wb[K++].reachable = true;
+            }
             if(plat[i][j] == 'A') N++;
         }
     }
