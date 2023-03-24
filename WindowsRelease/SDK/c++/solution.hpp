@@ -1,7 +1,6 @@
 #ifndef SOLUTION_HPP
 #define SOLUTION_HPP
 #include <bits/stdc++.h>
-#include <windows.h>
 #include "util.hpp"
 #define MAP_SIZE 100
 #define WORKBENCH_SIZE 50
@@ -148,8 +147,8 @@ struct robot {
 struct mcmf {
     
     const double eps = 1e-6;
-    const double para1 = -45000;
-    const double para2 = 4;
+    const double para1 = -45000; // 时间相关系数
+    const double para2 = 5;    // 价值相关系数
 
 
     int S, T;

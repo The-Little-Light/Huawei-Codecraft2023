@@ -140,6 +140,7 @@ double mcmf::countSellValue(int proType,int rtIdx,int endIndex){
 }
 
 double mcmf::countBuyValue(int proType,int rtIdx,int endIndex) {
+    if (proType != 0) return INF*2;
     coordinate s = rt[rtIdx].location;
     coordinate e = wb[endIndex].location;
     int left = leftTime[workbenchId[endIndex]]; // 剩余生产时间
@@ -150,9 +151,8 @@ double mcmf::countBuyValue(int proType,int rtIdx,int endIndex) {
     double estFrame = tt * 50;
     // double vv = -profitAndTime[proType].first.second; // 已购入支出
     int nextPro = wb[endIndex].type;
-    // vv -= -profitAndTime[nextPro].first.second; // 先预计购入支出
-    if (proType != 0) return INF*2;
-    return  -(para1 * tt) + inf + max(0.0, left - estFrame) * INF;
+    double vv = -profitAndTime[nextPro].first.second; // 先预计购入支出
+    return  -(para2 * vv + para1 * tt) + inf + max(0.0, left - estFrame) * INF;
 }
 
 
