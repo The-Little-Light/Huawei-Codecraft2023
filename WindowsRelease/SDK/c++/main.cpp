@@ -12,6 +12,7 @@ int frameID;                   // 当前帧
 int K;                         // 工作台数
 int N;                         // 机器人数
 int curMoney;                  // 当前金钱
+int totalSellNum[8];           // 物品的出售次数
 robot rt[ROBOT_SIZE];          // 机器人
 workbench wb[WORKBENCH_SIZE];  // 工作台
 char plat[MAP_SIZE][MAP_SIZE]; // 输入地图

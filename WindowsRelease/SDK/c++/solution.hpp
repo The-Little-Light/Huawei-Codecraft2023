@@ -240,9 +240,7 @@ extern int curMoney;                  // 当前金钱
 extern robot rt[ROBOT_SIZE];          // 机器人
 extern workbench wb[WORKBENCH_SIZE];  // 工作台
 extern char plat[MAP_SIZE][MAP_SIZE]; // 输入地图
-extern int collisionNum[ROBOT_SIZE];  // 碰撞次数
-extern int buyNum[8][ROBOT_SIZE];     // 物品的购买次数
-extern int sellNum[8][ROBOT_SIZE];    // 物品的出售次数
+extern int totalSellNum[8];    // 物品的出售次数
 extern const double PI;               // 圆周率
 extern mcmf curFlow;                  // 网络流实例
 extern ofstream fout;                 // 与日志文件关联的输出流
