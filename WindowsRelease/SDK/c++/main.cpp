@@ -32,10 +32,10 @@ void init() {
             if(plat[i][j] == 'A') N++;
         }
     }
-    // # ifdef DEBUG
-    // // 检测平台log
-    // fout.open("log.txt", ios_base::app);
-    // # endif
+    # ifdef DEBUG
+    // 检测平台log
+    fout.open("log.txt", ios_base::app);
+    # endif
     for (int i = 0; i < ROBOT_SIZE; ++i) {
         rt[i].rtIdx = i;
     }
@@ -155,29 +155,23 @@ void printRobotCommand(int robotId) {
 }
 
 int main() {
-    // bool initMark = true;
     readPlat();
     init();
     puts("OK");
     fflush(stdout);
     while (scanf("%d", &frameID) != EOF) {
         readInfo();
-        
-        // if (initMark) {
-        //     init();
-        //     initMark = false;
-        // }
         printf("%d\n", frameID);
         /**** CORE ****/   
-        // ori_solution();
-        curFlow.solution();
+        ori_solution();
+        // curFlow.solution();
         /**************/
         for(int robotId = 0; robotId < ROBOT_SIZE; robotId++){  
-            // # ifdef DEBUG
-            // // 各个机器人统计是否产生碰撞、购买、出售等行为       
-            // rt[robotId].collisionCount();
-            // rt[robotId].buysellCount();
-            // # endif
+            # ifdef DEBUG
+            // 各个机器人统计是否产生碰撞、购买、出售等行为       
+            rt[robotId].collisionCount();
+            rt[robotId].buysellCount();
+            # endif
             // 输出交互指令
             printRobotCommand(robotId);
         }
@@ -186,9 +180,9 @@ int main() {
         fflush(stdout);
     }
 
-    // # ifdef DEBUG
-    // printLog();
-    // # endif
+    # ifdef DEBUG
+    printLog();
+    # endif
 
     return 0;
 }
