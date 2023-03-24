@@ -460,8 +460,7 @@ void mcmf::adjustTask(int rtIdx){
 }
 
 void mcmf::checkDest(int rtIdx) {
-    robot &bot = rt[rtIdx];
-    bot.item = bot.pd_id;
+    robot &bot = rt[rtIdx];    
     if (bot.haveTemDest) { 
         // 检查是否到达临时目的地附近
         if (dis(bot.temDest, bot.location) < 0.5) {
