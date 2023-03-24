@@ -111,7 +111,8 @@ struct robot {
     double toward; // 朝向，弧度制
     coordinate location;
     command cmd;  // 当前帧要发布的控制指令
-    int collisionNum;  // 碰撞次数
+    int wallCollisionNum;  // 跟墙壁碰撞次数
+    int roboCollisionNum;  // 跟其他机器人碰撞次数
     int item;          // 当前帧产品类型
     int buyNum[8];     // 物品的购买次数
     int sellNum[8];    // 物品的出售次数
