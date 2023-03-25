@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-25 14:34:01
+ * @LastEditTime: 2023-03-25 15:24:01
  * @LastEditors: Xzh
  * @Description: 
  *      引入最小费用最大流进行全局任务规划，优化任务分配
@@ -535,19 +535,16 @@ void mcmf::switcher() {
 }
 
 void mcmf::adjustEdge() {
-    int cur = 0, id = T;
-    for (int i = 0,size = G[id].size(); i < size; i++) {
-        edge&ed = G[id][i];
-        if (G[ed.to][ed.rev].cap)  pre[cur++] = i;
-    }
-    while (cur) {
-        id = pre[--cur];
-        int endWbidx = ProductId2Workbench[id];
-        for (int i = 0,size = G[id].size(); i < size; i++) {
-            edge&ed = G[id][i];
-            if (G[ed.to][ed.rev].cap) {
-                int toWbidx = ProductId2Workbench[ed.to];
-                setEdgeCost(ed.to,ed.rev,countValue(wb[toWbidx].type,toWbidx,endWbidx));
+    for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
+        if (workbenchId[wbIdx] != -1) {
+            int id = workbenchId[wbIdx] ^ 1,type = wb[wbIdx].type;
+            for (int index = 1,size = G[id].size(); index < size; index++) {
+                edge &tmp = G[id][index];
+                int towbIdx = ProductId2Workbench[tmp.to];
+                if (produce2sell[type].count(tmp.to)) {
+                    tmp.cost = countValue(type,wbIdx,towbIdx);
+                    G[tmp.to][tmp.rev].cost = -tmp.cost;
+                }
             }
         }
     }
