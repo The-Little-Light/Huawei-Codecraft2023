@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-23 23:35:47
+ * @LastEditTime: 2023-03-25 14:34:01
  * @LastEditors: Xzh
  * @Description: 
  *      引入最小费用最大流进行全局任务规划，优化任务分配
@@ -105,11 +105,9 @@ double mcmf::countValue(int proType,int startIndex,int endIndex) {
     // 考虑剩余原材料格对价值的影响，目标工作台的剩余材料格越少越重视
     if (wb[endIndex].type > 7) {
         vv *= 0.8;
-        if (frameID >= 8300) return 2*INF;
     }
     else if (wb[endIndex].type == 7) {
         vv += 0.3*nextVv/(4-wb[endIndex].rawMaterNum());
-        if (frameID >= 7500 && proType == 6) return INF;
     }
     else if (wb[endIndex].type > 3) {
         vv += 0.3*nextVv/(3-wb[endIndex].rawMaterNum());
@@ -149,7 +147,7 @@ double mcmf::countSellValue(int proType,int rtIdx,int endIndex){
     }
     int nextPro = wb[endIndex].type;
     if (rtIdx == 1 && nextPro == 6)  vv *= 3;
-    if (rtIdx == 2 && nextPro == 6)  vv *= 3;
+    // if (rtIdx == 2 && nextPro == 6)  vv *= 3;
     return  - ( para2 * vv + para1 * tt) + inf;
 }
 
@@ -523,6 +521,37 @@ void mcmf::checkDest(int rtIdx) {
     }
 }
 
+void mcmf::switcher() {
+    for (int rtIdx = 0; rtIdx < N; ++rtIdx) {
+        robot &bot = rt[rtIdx];
+        while (!bot.taskQueue.empty()) {
+            bot.taskQueue.pop();
+        }
+        if (bot.nodeId != -1) {
+            bot.taskQueue.push(bot.curTask);
+        }
+    }
+}
+
+void mcmf::adjustEdge() {
+    int cur = 0, id = T;
+    for (int i = 0,size = G[id].size(); i < size; i++) {
+        edge&ed = G[id][i];
+        if (G[ed.to][ed.rev].cap)  pre[cur++] = i;
+    }
+    while (cur) {
+        id = pre[--cur];
+        int endWbidx = ProductId2Workbench[id];
+        for (int i = 0,size = G[id].size(); i < size; i++) {
+            edge&ed = G[id][i];
+            if (G[ed.to][ed.rev].cap) {
+                int toWbidx = ProductId2Workbench[ed.to];
+                setEdgeCost(ed.to,ed.rev,countValue(wb[toWbidx].type,toWbidx,endWbidx));
+            }
+        }
+    }
+}
+
 void mcmf::solution() {
     // 检查工作台状态
     //TODO parallel
@@ -564,6 +593,10 @@ void mcmf::solution() {
         rt[rtIdx].cmd.clean(); // 清除之前指令设置
         rt[rtIdx].checkSpeed();// 保证速度非0
         checkDest(rtIdx);// 检查是否到达目的地
+    }
+    adjustEdge();// 调整与工作台相连的边权网络
+
+    for (int rtIdx = 0; rtIdx < N; ++rtIdx) {
         adjustEdge(rtIdx);// 调整网络
     }
     // 指令规划

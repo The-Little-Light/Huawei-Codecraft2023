@@ -231,6 +231,12 @@ struct mcmf {
     // 计算价值函数,计算机器人从当前位置前往对应工作台出售的开销
     // 参数依次为携带产品类型、机器人下标、终点
     double countSellValue(int proType,int rtIdx,int endIndex);
+
+    // 用以兼容在帧开始或调度完成时在网络流和贪心之间切换
+    void switcher();
+
+    // 用于调整countBuyvalue边权
+    void adjustEdge();
 };
 
 extern int frameID;                   // 当前帧
