@@ -8,8 +8,8 @@
 #define DEBUG
 // #define ESTIMATE
 //TODO polish
-#define poolSize  WORKBENCH_SIZE * 6    //产品池大小
-#define maxNode  WORKBENCH_SIZE * 4 + ROBOT_SIZE * 2 + poolSize * 2 
+#define poolSize  WORKBENCH_SIZE    //产品池最大大小
+#define maxNode  WORKBENCH_SIZE * 4 + ROBOT_SIZE * 2 + poolSize * 10
 #define inf  990000
 #define INF  1e18
 #define vec coordinate
@@ -155,6 +155,7 @@ struct mcmf {
     const double eps = 1e-6;
     double para1 = -45000; // 时间相关系数
     double para2 = 5;    // 价值相关系数
+    double para4 = 0.3; // 价值期望系数
 
 
     int S, T;
@@ -163,9 +164,9 @@ struct mcmf {
     int ProductId2Workbench[maxNode];          // 原料格id转工作台 //TODO:check whether should use map
 
     int workbenchId[WORKBENCH_SIZE];           // 工作台产品格id
-    int cnt;                                   // 节点总数
-    int curSize;                               // 空闲产品节点数量
-    int pool[poolSize];                        // 空闲节点池
+    int cnt;                                        // 节点总数
+    int curSize[10];                               // 空闲产品节点数量
+    int pool[10][poolSize];                        // 空闲节点池
 
     set<int> produce2sell[10];                 // TODO :whether should move to global
 
@@ -198,6 +199,7 @@ struct mcmf {
     int vis[maxNode];                        // 顶点是否在队列中
     int pre[maxNode];                        // 最短路上的前驱节点
     int pe[maxNode];                         // 最短路上的前驱边
+    coordinate preDestion[ROBOT_SIZE];          // 预设坐标
     int leftTime[maxNode];                   // 剩于生产时间
     int stateBuf[ROBOT_SIZE][ROBOT_SIZE * 15][2];// 用于权值回退
     int bufCur = 0;                          // 已使用的Buf数
@@ -207,11 +209,11 @@ struct mcmf {
     int getNode(){return cnt++;}
     void init();                        // 在init()后运行
 
-    mcmf():cnt(0),curSize(0){}
+    mcmf():cnt(0){}
     int spfa();                         
     int solve();                        // 基于spfa计算最小费用流
 
-    void releaseNode(int id);           // 将某个节点移入空闲节点池
+    void releaseNode(int id,int type);           // 将某个节点移入空闲节点池
     void lockNode(int rtIdx,int wbIdx); // 工作台产品被机器人获取
     void allocateNode(int wbIdx);       // 为工作台产品分配节点
 
@@ -228,6 +230,7 @@ struct mcmf {
     // 计算价值函数,计算机器人购买产品后，将其运往出售的开销
     // 参数依次为携带产品类型、起点、终点
     double countValue(int proType,int startIndex,int endIndex);
+    double countvv(int proType,int endIndex); //计算出售收入
 
     // 计算价值函数,计算机器人购买产品后，将其销毁并前往其它工作台的开销
     // 参数依次为携带产品类型(0表示没有)、机器人下标、终点

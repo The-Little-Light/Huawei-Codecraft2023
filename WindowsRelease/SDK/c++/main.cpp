@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzx
  * @Date: 2023-03-15 00:10:42
- * @LastEditTime: 2023-03-25 14:00:03
+ * @LastEditTime: 2023-03-25 16:53:31
  * @LastEditors: Xzh
  * @Description: 
  */
@@ -98,6 +98,8 @@ void init() {
     }
     else if (K == 25) {
         // cerr << "map2" << endl;
+        curFlow.para1 = -390000;
+        curFlow.para2 = 40;
     }
     else if (K == 50) {
         // cerr << "map3" << endl;
@@ -107,6 +109,12 @@ void init() {
     }
     else if (K == 18) {
         // cerr << "map4" << endl;
+        para1 = 700000;
+        para2 = 7;
+        para4 = 0.2;
+        curFlow.para1 = -390000;
+        curFlow.para2 = 45;
+        curFlow.para4 = 0.35;
     }
 }
 
@@ -193,9 +201,7 @@ int main() {
         readInfo();
         printf("%d\n", frameID);
         /**** CORE ****/   
-        if (K == 25 && frameID <= 8000) {
-            curFlow.para1 = -390000;
-            curFlow.para2 = 40;
+        if (frameID <= 8000) {
             curFlow.solution();
             if (frameID == 8000) curFlow.switcher();
         }
