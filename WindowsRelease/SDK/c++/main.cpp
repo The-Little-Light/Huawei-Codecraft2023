@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzx
  * @Date: 2023-03-15 00:10:42
- * @LastEditTime: 2023-03-25 19:53:09
+ * @LastEditTime: 2023-03-25 23:50:03
  * @LastEditors: Xzh
  * @Description: 
  */
@@ -114,7 +114,7 @@ void init() {
         para4 = 0.2;
         curFlow.para1 = -390000;
         curFlow.para2 = 45;
-        curFlow.para4 = 0.35;
+        curFlow.para4 = 0.4;
     }
 }
 
