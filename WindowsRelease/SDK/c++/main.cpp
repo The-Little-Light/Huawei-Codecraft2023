@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzx
  * @Date: 2023-03-15 00:10:42
- * @LastEditTime: 2023-03-21 21:16:11
+ * @LastEditTime: 2023-03-25 14:00:03
  * @LastEditors: Xzh
  * @Description: 
  */
@@ -193,10 +193,11 @@ int main() {
         readInfo();
         printf("%d\n", frameID);
         /**** CORE ****/   
-        if (K == 25) {
+        if (K == 25 && frameID <= 8000) {
             curFlow.para1 = -390000;
             curFlow.para2 = 40;
             curFlow.solution();
+            if (frameID == 8000) curFlow.switcher();
         }
         else {
             ori_solution();
