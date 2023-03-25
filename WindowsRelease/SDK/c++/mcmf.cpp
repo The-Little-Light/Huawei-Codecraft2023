@@ -528,6 +528,7 @@ void mcmf::switcher() {
             bot.taskQueue.pop();
         }
         if (bot.nodeId != -1) {
+            bot.curMission.set(0, bot.curTask.destId, bot.pd_id);
             bot.taskQueue.push(bot.curTask);
         }
     }
