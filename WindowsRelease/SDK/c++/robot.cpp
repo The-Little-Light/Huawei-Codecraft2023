@@ -88,7 +88,10 @@ void robot::checkTask() {
                 break;
             }
         }
-        if (!success) return;
+        if (!success) {
+            setSpeed(curFlow.preDestion[this->rtIdx]);
+            return;
+        }
     }
     if (haveTemDest) {
         // 前往临时目的地

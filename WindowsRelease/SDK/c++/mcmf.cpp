@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-25 15:24:01
+ * @LastEditTime: 2023-03-25 19:11:51
  * @LastEditors: Xzh
  * @Description: 
  *      引入最小费用最大流进行全局任务规划，优化任务分配
@@ -12,19 +12,33 @@
 
 void mcmf::init(){
     S = getNode(), T = getNode();
-    for (int i = 0; i < N; i++) robotId[i] = getNode(),addEdge(S,robotId[i],0,1);
+
+    for (int i = 1; i < 4; i++) {
+        curSize[i] = poolSize;
+    }
+    for (int i = 4; i < 7; i++) {
+        curSize[i] = poolSize / 3;
+    }
+    curSize[7] = poolSize / 9;
+
+    int dx[4] = {-1,-1,1,1};
+    int dy[4] = {-1,1,-1,1};
+    int ddis = 25/2;
+
+    for (int i = 0; i < N; i++) {
+        robotId[i] = getNode(),addEdge(S,robotId[i],0,1);
+        preDestion[i].set(dx[i] * ddis + 25, dy[i] * ddis + 25);
+    }
     for (int i = 0; i < K; i++) {
         workbenchId[i] = -1;
         for(int j = 0; j < 3; j++) workbenchProductId[i][j] = -1;
     }
 
-    vector<int> index;      //与T相连的工作台
 
     // 为原料格加点加边+维护index数组
     auto setID = [&](int &pst,int wbIdx,int cap = inf){
         pst = getNode();
         addEdge(pst,T,0,cap);
-        index.push_back(pst);
         ProductId2Workbench[pst] = wbIdx;
     };
     // 建立原料格对汇点的边
@@ -83,44 +97,52 @@ void mcmf::init(){
 
     // 初始化空闲产品节点池
     if (cnt&1) getNode();
-    for (; curSize < poolSize; curSize++) {
-        int indexSize = index.size();
-        pool[curSize] = getNode();
-        int codNode = getNode();
-
-        for (int i = 0; i < N; i++) addEdge(robotId[i],pool[curSize],0,0);
-        addEdge(pool[curSize],codNode,0,1);
-        for (int i = 0; i < indexSize; i++) addEdge(codNode,index[i],0,0);
+    for (int type = 1; type < 8; ++type){
+        for (int cur = 0,size = curSize[type]; cur < size; ++cur){
+            pool[type][cur] = getNode();
+            int codNode = getNode(), nodeId = codNode ^ 1;
+            for (int i = 0; i < N; i++) addEdge(robotId[i],nodeId,0,0);
+            addEdge(nodeId,codNode,0,1);
+            for (auto id : produce2sell[type]) addEdge(codNode,id,0,0);
+        }
     }
 }
 
 //静态价值参数调整
-double mcmf::countValue(int proType,int startIndex,int endIndex) {
-    coordinate s = wb[startIndex].location;
-    coordinate e = wb[endIndex].location;
-    double dd = dis(s, e);                  // 机器人从起点到终点的距离
-    double tt = dd/6 + 1;
+
+double mcmf::countvv(int proType,int endIndex) {
     double vv = profitAndTime[proType].first.first; // 出售收入
     double nextVv = profitAndTime[wb[endIndex].type].first.first - profitAndTime[wb[endIndex].type].first.second;
     // 考虑剩余原材料格对价值的影响，目标工作台的剩余材料格越少越重视
     if (wb[endIndex].type > 7) {
         vv *= 0.8;
+        if (K== 18) vv *= 5;
+    } else if (wb[endIndex].type == 7) {
+        vv += para4*nextVv/(4-wb[endIndex].rawMaterNum());
+        if (K== 18) vv *= 3;
+    } else if (wb[endIndex].type > 3) {
+        vv += para4*nextVv/(3-wb[endIndex].rawMaterNum());
     }
-    else if (wb[endIndex].type == 7) {
-        vv += 0.3*nextVv/(4-wb[endIndex].rawMaterNum());
-    }
-    else if (wb[endIndex].type > 3) {
-        vv += 0.3*nextVv/(3-wb[endIndex].rawMaterNum());
-    }
+    
     if (wb[endIndex].type == 4) {
-        vv *= (1+max(0, totalSellNum[4]-min(totalSellNum[5], totalSellNum[6])));
+        vv *= (1+max(0, min(totalSellNum[5], totalSellNum[6]) - totalSellNum[4]) * 2);
+        if (K== 18 && frameID <= 5000) vv*=10;
+    } else if (wb[endIndex].type == 5) {
+        vv *= (1+max(0, min(totalSellNum[4], totalSellNum[6]) - totalSellNum[5]) * 2);
+        if (K== 18 && frameID <= 3500) vv*=1.25 + (frameID <= 1200)*2.75;
+    } else if (wb[endIndex].type == 6) {
+        vv *= (1+max(0, min(totalSellNum[5], totalSellNum[4]) - totalSellNum[6]) * 2);
     }
-    else if (wb[endIndex].type == 5) {
-        vv *= (1+max(0, totalSellNum[5]-min(totalSellNum[4], totalSellNum[6])));
-    }
-    else if (wb[endIndex].type == 6) {
-        vv *= (1+max(0, totalSellNum[6]-min(totalSellNum[5], totalSellNum[4])));
-    }
+    return vv;
+}
+
+double mcmf::countValue(int proType,int startIndex,int endIndex) {
+    coordinate s = wb[startIndex].location;
+    coordinate e = wb[endIndex].location;
+    double dd = dis(s, e);                  // 机器人从起点到终点的距离
+    double tt = dd/6 + 1;
+    double vv = countvv(proType,endIndex); // 出售收入
+   
     return  - ( para2 * vv + para1 * tt) + inf;
 }
 
@@ -133,20 +155,11 @@ double mcmf::countSellValue(int proType,int rtIdx,int endIndex){
     vec s2e(e.x - s.x, e.y - s.y);              // 起点到终点的向量
     double rr = cntAngle(rt[rtIdx].lsp, s2e);   // 任务所需转动角度和
     double tt = dd/6 + rr/PI + 1;
-    double vv = profitAndTime[proType].first.first; // 出售收入
-    double nextVv = profitAndTime[wb[endIndex].type].first.first - profitAndTime[wb[endIndex].type].first.second;
-    // 考虑剩余原材料格对价值的影响，目标工作台的剩余材料格越少越重视
-    if (wb[endIndex].type > 7) {
-        vv *= 0.8;
-    }
-    else if (wb[endIndex].type == 7) {
-        vv += 0.3*nextVv/(4-wb[endIndex].rawMaterNum());
-    }
-    else if (wb[endIndex].type > 3) {
-        vv += 0.3*nextVv/(3-wb[endIndex].rawMaterNum());
-    }
+    double vv = countvv(proType,endIndex); // 出售收入
+    
+    
     int nextPro = wb[endIndex].type;
-    if (rtIdx == 1 && nextPro == 6)  vv *= 3;
+    if (K== 25 && rtIdx == 1 && nextPro == 6)  vv *= 8;
     // if (rtIdx == 2 && nextPro == 6)  vv *= 3;
     return  - ( para2 * vv + para1 * tt) + inf;
 }
@@ -170,8 +183,9 @@ double mcmf::countBuyValue(int proType,int rtIdx,int endIndex) {
 
 void mcmf::allocateNode(int wbIdx){
     if (workbenchId[wbIdx] == -1) {
-        workbenchId[wbIdx] = pool[--curSize];
-        int id = workbenchId[wbIdx],type = wb[wbIdx].type;
+        int id ,type = wb[wbIdx].type;
+        id = workbenchId[wbIdx] = pool[type][--curSize[type]];
+
         ProductId2Workbench[id] = wbIdx;
         ProductId2Workbench[id ^ 1] = wbIdx;
         
@@ -187,12 +201,9 @@ void mcmf::allocateNode(int wbIdx){
         for (int index = 1,size = G[id].size(); index < size; index++) {
             edge &tmp = G[id][index];
             int towbIdx = ProductId2Workbench[tmp.to];
-            if (produce2sell[type].count(tmp.to)) {
-                tmp.cap = 1, G[tmp.to][tmp.rev].cap = 0;
-                tmp.cost = countValue(type,wbIdx,towbIdx);
-                G[tmp.to][tmp.rev].cost = -tmp.cost;
-            }
-
+            tmp.cap = 1, G[tmp.to][tmp.rev].cap = 0;
+            tmp.cost = countValue(type,wbIdx,towbIdx);
+            G[tmp.to][tmp.rev].cost = -tmp.cost;
         }
     }
     int id = workbenchId[wbIdx];
@@ -310,11 +321,11 @@ void mcmf::resetCap(){
     }
 }
 
-void mcmf::releaseNode(int id){
+void mcmf::releaseNode(int id,int type){
     for(edge&ed:G[id]){
         ed.cap = G[ed.to][ed.rev].cap = 0;
     }
-    pool[curSize++] = id;
+    pool[type][curSize[type]++] = id;
     id ^= 1;
     for(edge&ed:G[id]){
         ed.cap = G[ed.to][ed.rev].cap = 0;
@@ -356,11 +367,9 @@ void mcmf::adjustEdge(int rtIdx){
         for (int index = 1,size = G[nodeId].size(); index < size; index++) {
             edge &tmp = G[nodeId][index];
             int towbIdx = ProductId2Workbench[tmp.to];
-            if (produce2sell[type].count(tmp.to)) {
-                tmp.cap = 1, G[tmp.to][tmp.rev].cap = 0;
-                tmp.cost = countSellValue(type,rtIdx,towbIdx);
-                G[tmp.to][tmp.rev].cost = -tmp.cost;
-            }
+            tmp.cap = 1, G[tmp.to][tmp.rev].cap = 0;
+            tmp.cost = countSellValue(type,rtIdx,towbIdx);
+            G[tmp.to][tmp.rev].cost = -tmp.cost;
         }
     } 
 }
@@ -506,7 +515,7 @@ void mcmf::checkDest(int rtIdx) {
                         int id = workbenchProductId[bot.wb_id][index];
                         setEdgeCap(id,0,0);
                     }
-                    releaseNode(bot.nodeId); 
+                    releaseNode(bot.nodeId,bot.pd_id); 
                     bot.nodeId = -1,bot.pd_id = 0;
                 } else {
                     if (!leftTime[workbenchId[bot.wb_id]]) {
@@ -541,10 +550,8 @@ void mcmf::adjustEdge() {
             for (int index = 1,size = G[id].size(); index < size; index++) {
                 edge &tmp = G[id][index];
                 int towbIdx = ProductId2Workbench[tmp.to];
-                if (produce2sell[type].count(tmp.to)) {
-                    tmp.cost = countValue(type,wbIdx,towbIdx);
-                    G[tmp.to][tmp.rev].cost = -tmp.cost;
-                }
+                tmp.cost = countValue(type,wbIdx,towbIdx);
+                G[tmp.to][tmp.rev].cost = -tmp.cost;
             }
         }
     }
@@ -605,7 +612,7 @@ void mcmf::solution() {
             rt[rtIdx].setSpeed(rt[rtIdx].temDest);
         } else if(rt[rtIdx].curTask.destId != -1) {
             rt[rtIdx].setSpeed(rt[rtIdx].curTask.destCo);
-        }
+        } else rt[rtIdx].setSpeed(preDestion[rtIdx]);
     };
     //TODO parallel
     // 检查调整机器人任务执行
