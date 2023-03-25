@@ -95,6 +95,11 @@ struct misson {
         endIndex = e;
         proType = p;
     }
+    void set(int s, int e, int p) {
+        startIndex = s;
+        endIndex = e;
+        proType = p;
+    }
     misson(){};
     void countValue(coordinate& rtCo, int proType, vec& lsp);
 };
