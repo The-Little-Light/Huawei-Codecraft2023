@@ -17,9 +17,9 @@ void mcmf::init(){
         curSize[i] = poolSize;
     }
     for (int i = 4; i < 7; i++) {
-        curSize[i] = poolSize / 3;
+        curSize[i] = poolSize / 2;
     }
-    curSize[7] = poolSize / 9;
+    curSize[7] = poolSize / 6;
 
     int dx[4] = {-1,-1,1,1};
     int dy[4] = {-1,1,-1,1};
