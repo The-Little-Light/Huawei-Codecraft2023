@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-25 19:11:51
+ * @LastEditTime: 2023-03-25 19:58:42
  * @LastEditors: Xzh
  * @Description: 
  *      引入最小费用最大流进行全局任务规划，优化任务分配
@@ -129,7 +129,7 @@ double mcmf::countvv(int proType,int endIndex) {
         if (K== 18 && frameID <= 5000) vv*=10;
     } else if (wb[endIndex].type == 5) {
         vv *= (1+max(0, min(totalSellNum[4], totalSellNum[6]) - totalSellNum[5]) * 2);
-        if (K== 18 && frameID <= 3500) vv*=1.25 + (frameID <= 1200)*2.75;
+        if (K== 18 && frameID <= 3500) vv*=1.2 + (frameID <= 1200)*2.801;
     } else if (wb[endIndex].type == 6) {
         vv *= (1+max(0, min(totalSellNum[5], totalSellNum[4]) - totalSellNum[6]) * 2);
     }
@@ -159,7 +159,7 @@ double mcmf::countSellValue(int proType,int rtIdx,int endIndex){
     
     
     int nextPro = wb[endIndex].type;
-    if (K== 25 && rtIdx == 1 && nextPro == 6)  vv *= 8;
+    if (K== 25 && rtIdx == 1 && nextPro == 6)  vv *= 5;
     // if (rtIdx == 2 && nextPro == 6)  vv *= 3;
     return  - ( para2 * vv + para1 * tt) + inf;
 }

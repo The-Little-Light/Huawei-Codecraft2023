@@ -89,7 +89,7 @@ void robot::checkTask() {
             }
         }
         if (!success) {
-            setSpeed(curFlow.preDestion[this->rtIdx]);
+            if (K==25 || K == 18) setSpeed(curFlow.preDestion[this->rtIdx]);
             return;
         }
     }
