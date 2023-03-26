@@ -1,4 +1,4 @@
-#include "solution.hpp"
+#include "../inc/codecraft2023.hpp"
 
 /******************************
 author:     xiezx
@@ -15,7 +15,7 @@ void ori_solution() {
     for (int rtIdx = 0; rtIdx < ROBOT_SIZE; ++rtIdx) {
         rt[rtIdx].checkSpeed(); // 保证速度非0
         if (rt[rtIdx].taskQueue.size()) {
-            misson& tmp = rt[rtIdx].curMission;
+            mission& tmp = rt[rtIdx].curMission;
             wb[tmp.endIndex].setProType(tmp.proType);
         }
     }

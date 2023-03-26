@@ -1,4 +1,4 @@
-#include "solution.hpp"
+#include "../inc/robot.hpp"
 
 // 统计碰撞次数
 void robot::collisionCount() {    
@@ -9,20 +9,20 @@ void robot::collisionCount() {
         }
         robotRadius += 0.1;
         // 判断碰撞原因
-        if (fabs(location.x) <= robotRadius || fabs(location.x - 50.0) <= robotRadius || fabs(location.y) <= robotRadius || fabs(location.y - 50.0) <= robotRadius) {
-            ++wallCollisionNum;
+        if (fabs(location.x) <= robotRadius || fabs(location.x - 50.0) <= robotRadius) {
+            dataLog.addWallCol(rtIdx);
         }
-        else ++roboCollisionNum;
+        else if (fabs(location.y) <= robotRadius || fabs(location.y - 50.0) <= robotRadius) {
+            dataLog.addWallCol(rtIdx);
+        }
+        else dataLog.addRoboCol(rtIdx);
     }
 }
 
 // 统计购买与出售次数
 void robot::buysellCount() {
-    if (cmd.buy)   ++buyNum[wb[wb_id].type];
-    if (cmd.sell)  {
-        ++sellNum[item];
-        ++totalSellNum[item];
-    }
+    if (cmd.buy)  dataLog.buyProduct(rtIdx, wb[wb_id].type);
+    if (cmd.sell) dataLog.sellProduct(rtIdx, item);
 }
 
 // 设置临时目的地
@@ -67,11 +67,11 @@ void robot::checkDest() {
 void robot::checkTask() {
     if (taskQueue.empty()) {
         // 分配新任务
-        vector<misson> msNode; // 任务节点
+        std::vector<mission> msNode; // 任务节点
         findMission(msNode, location, lsp);
         bool success = false;
         for (int i = 0; i < msNode.size(); ++i) {
-            misson selected = msNode[i];
+            mission selected = msNode[i];
             // 预计到达生产工作台时已有产品生成且预计任务能在第9000帧之前完成才接单
             // cerr << "robot" << rtIdx << ": " << frameID << "   " << selected.estFrame + frameID << endl;
             #ifdef ESTIMATE
@@ -112,11 +112,11 @@ void robot::checkSpeed() {
     }
 }
 
-bool cmp (misson& a, misson& b) {
+bool cmp (mission& a, mission& b) {
     return a.v > b.v;
 }
 
-void robot::findMission(vector<misson>& msNode, coordinate& rtCo, vec& lsp) {
+void robot::findMission(std::vector<mission>& msNode, coordinate& rtCo, vec& lsp) {
     for (int wbIdx = 0; wbIdx < K; ++wbIdx) {
         // 寻找有现成产品或正在生产中的可达生产工作台
         #ifdef ESTIMATE
@@ -130,7 +130,7 @@ void robot::findMission(vector<misson>& msNode, coordinate& rtCo, vec& lsp) {
                 // 收购方是8或9号工作台，或者，对应原材料格为空
                 if (wb[buyWbIdx].type > 7 || !wb[buyWbIdx].checkHaveProType(proType)) {
                     // 此时从 wbIdx 到 buyWbIdx 是一个潜在任务
-                    misson pot = misson(wbIdx, buyWbIdx, proType);
+                    mission pot = mission(wbIdx, buyWbIdx, proType);
                     pot.countValue(rtCo, proType, lsp);
                     if (K == 18 && rtIdx < 2 && wb[buyWbIdx].type == 4) {
                         pot.v *= 2;

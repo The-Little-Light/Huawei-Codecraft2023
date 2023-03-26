@@ -10,5 +10,6 @@ if (NOT WIN32)
 endif (NOT WIN32)
 
 AUX_SOURCE_DIRECTORY(. src)
+AUX_SOURCE_DIRECTORY(./src src)
 list(REMOVE_ITEM src "./load_pthread.cpp")
 ADD_EXECUTABLE(main ${src})

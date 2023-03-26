@@ -1,15 +1,9 @@
-/*** 
- * @Author: Xzx
- * @Date: 2023-03-21
- * @Description: 
- *      自用数学库的实现
- ***/
-#include "solution.hpp"
+#include "../inc/codecraft2023.hpp"
 
 const double PI = acos(-1);
 
 // 向量模
-double modulusOfVector(vec& a) {
+double modulusOfvector(vec& a) {
     return sqrt(a.x*a.x + a.y*a.y);
 }
 
@@ -31,10 +25,10 @@ double dis(coordinate& c1, coordinate& c2) {
 
 // 计算两个向量的夹角
 double cntAngle(vec& a, vec& b){
-    double angleDiff = acos(max(-1.0,min(1.0, dotProduct(a, b) / (modulusOfVector(a)*modulusOfVector(b)))));
+    double angleDiff = acos(max(-1.0,min(1.0, dotProduct(a, b) / (modulusOfvector(a)*modulusOfvector(b)))));
     if (isnan(angleDiff)) {
         double dp = dotProduct(a, b);
-        double mxm = modulusOfVector(a)*modulusOfVector(b);
+        double mxm = modulusOfvector(a)*modulusOfvector(b);
         fprintf(stderr, "dotProduct:%lf\t m(a)*m(b):%lf\t cos:%lf\n",dp, mxm, dp/mxm);
         angleDiff = 0;
     }

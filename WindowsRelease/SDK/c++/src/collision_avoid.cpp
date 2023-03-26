@@ -7,11 +7,11 @@
  *      引入势能场的概念，把碰撞处理从紧急避让变成引入势能较低点作为临时目的地（3-17）
  *      对势能场分布进行修正，加入角度考量（3-19）
  ***/
-#include "solution.hpp"
+#include "../inc/codecraft2023.hpp"
 
 // 计算势能分布 a 为角度，lsp 为线速度向量
 double cntR(double a, vec& lsp, double asp) {
-    double lm = modulusOfVector(lsp);
+    double lm = modulusOfvector(lsp);
     // a -= 0.0002 * asp;         // 角度偏置
     double e_up = -1 * a * a * lm * lm / 36;
     return exp(e_up) * lm / 6;
@@ -31,6 +31,7 @@ double cntPontEnergy(int rtIdx, coordinate& d) {
 
 void collitionAvoidance() {
     double u = 0.5; // 拥塞阈值
+    if (K == 18) u = 0.35;
     for (int curRt = 0; curRt < ROBOT_SIZE; ++curRt) {
         // if (rt[curRt].haveTemDest) continue;
         // 枚举每个机器人，计算其碰撞势能检测点受到的势能
@@ -52,8 +53,8 @@ void collitionAvoidance() {
         }
         if (pe >= u) {
             // 需要进行碰撞避免，进行让路者选举
-            double lm1 = modulusOfVector(lsp);
-            double lm2 = modulusOfVector(rt[maxPeComponent.second].lsp);
+            double lm1 = modulusOfvector(lsp);
+            double lm2 = modulusOfvector(rt[maxPeComponent.second].lsp);
             // if (lm2 <= 1 && lm1 > lm2) {
             //     // 当本方速度高于对方且对方速度小于1.2时，本方避让
             //     double dis_para = 0.2;
@@ -76,7 +77,7 @@ void collitionAvoidance() {
             //         rt[curRt].setTemporaryDest(aRight);
             //     }
             // }
-            if (lm1 <= lm2) {
+            if (lm1 <= lm2 || (K == 18 && rt[curRt].pd_id == 0)) {
                 // fprintf(stderr, "cur speed:%.2f\n",lm1);
                 // 两个避让候选点根据势能选择低势能者为临时目的地
                 double rot = PI/6;
