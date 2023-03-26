@@ -7,7 +7,7 @@
  *      引入最小费用最大流进行全局任务规划，优化任务分配
  */
 
-#include "solution.hpp"
+#include "../inc/codecraft2023.hpp"
 
 
 void mcmf::init(){
@@ -36,7 +36,7 @@ void mcmf::init(){
 
 
     // 为原料格加点加边+维护index数组
-    auto setID = [&](int &pst,int wbIdx,int cap = inf){
+    auto setID = [&](int &pst,int wbIdx,int cap = OFFSET){
         pst = getNode();
         addEdge(pst,T,0,cap);
         ProductId2Workbench[pst] = wbIdx;
@@ -143,7 +143,7 @@ double mcmf::countValue(int proType,int startIndex,int endIndex) {
     double tt = dd/6 + 1;
     double vv = countvv(proType,endIndex); // 出售收入
    
-    return  - ( para2 * vv + para1 * tt) + inf;
+    return  - ( para2 * vv + para1 * tt) + OFFSET;
 }
 
 //TODO is it can merge with above function
@@ -161,7 +161,7 @@ double mcmf::countSellValue(int proType,int rtIdx,int endIndex){
     int nextPro = wb[endIndex].type;
     if (K== 25 && rtIdx == 1 && nextPro == 6)  vv *= 4.5;
     // if (rtIdx == 2 && nextPro == 6)  vv *= 3;
-    return  - ( para2 * vv + para1 * tt) + inf;
+    return  - ( para2 * vv + para1 * tt) + OFFSET;
 }
 
 double mcmf::countBuyValue(int proType,int rtIdx,int endIndex) {
@@ -177,7 +177,7 @@ double mcmf::countBuyValue(int proType,int rtIdx,int endIndex) {
     // double vv = -profitAndTime[proType].first.second; // 已购入支出
     int nextPro = wb[endIndex].type;
     double vv = -profitAndTime[nextPro].first.second; // 先预计购入支出
-    return  -(para2 * vv + para1 * tt) + inf + max(0.0, left - estFrame) * INF;
+    return  -(para2 * vv + para1 * tt) + OFFSET+ max(0.0, left - estFrame) * INF;
 }
 
 
@@ -249,7 +249,7 @@ int mcmf::solve() {
     bufCur = 0;
     flow = 0;
     while(spfa() > 0){
-        int newflow = inf,index = 0;
+        int newflow = OFFSET,index = 0;
         for(int x = T; x != S; x = pre[x])  newflow = min(newflow,G[pre[x]][pe[x]].cap);
         for(int x = T; x != S; x = pre[x])  {
             stateBuf[bufCur][index][0] = pre[x],stateBuf[bufCur][index++][1] = pe[x];
@@ -378,7 +378,7 @@ void mcmf::adjustEdge(int rtIdx){
  *return value : 
  *   0 when a is normal value;
  *   1 when a is NaN;
- *   0 when a is inf;
+ *   0 when a is OFFSET;
  */
 int mcmf::checkVaild(double a) {
     if (isnan(a)) {
@@ -431,7 +431,7 @@ void mcmf::adjustTask(int rtIdx){
 
                 auto printError = [&](const char *pre,int flag) {
                     if (flag & 1) fprintf(stderr,"%s   NaN checked\n",pre);
-                    if (flag & 2) fprintf(stderr,"%s   inf checked\n",pre);       
+                    if (flag & 2) fprintf(stderr,"%s   OFFSETchecked\n",pre);       
                     if (flag & 4) fprintf(stderr,"%s   Unknown Error\n",pre);       
                 };
 
@@ -444,7 +444,7 @@ void mcmf::adjustTask(int rtIdx){
                 printError("countSellValue",check(tmpId));
 
 
-                vector<int> de;
+                std::vector<int> de;
                 for (int i = 0,size = G[tmpId].size(); i < size; i++) {
                     edge&ed = G[tmpId][i];
                     if (ed.cap) de.push_back(ed.to);

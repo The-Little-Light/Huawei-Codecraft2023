@@ -1,6 +1,12 @@
-#include "solution.hpp"
+#include "../inc/codecraft2023.hpp"
 
-void misson::countValue(coordinate& rtCo, int proType, vec& lsp) {
+void mission::set(int s, int e, int p) {
+    startIndex = s;
+    endIndex = e;
+    proType = p;
+}
+
+void mission::countValue(coordinate& rtCo, int proType, vec& lsp) {
     // 计算价值函数 参数依次为机器人坐标、预计携带产品类型、机器人速度向量
     coordinate s = wb[startIndex].location;
     coordinate e = wb[endIndex].location;

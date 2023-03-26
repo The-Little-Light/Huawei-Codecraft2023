@@ -8,7 +8,7 @@
  *      2、线速度由朝向与目的地的夹角确定，夹角越大，线速度越小；当朝向为目的方向时，以最大线速度前进（避免行星运动）
  *      3、当机器人与墙的距离小于某个阈值时，检测是否会撞墙，若会，降低线速度（避免撞墙）(未实现)
  ***/
-#include "solution.hpp"
+#include "../inc/codecraft2023.hpp"
 
 void robot::setSpeed(coordinate dest) {
     // 参数
@@ -27,11 +27,15 @@ void robot::setSpeed(coordinate dest) {
     absAngleDiff = sign*angleDiff;
 
     // Limit the angular velocity according to the angle
-    if (absAngleDiff * 15 > PI) {
+    // double rotatePara = 8; try until here
+    double rotatePara = 15;
+    if (K == 25) rotatePara = 10;
+    else if (K == 43) rotatePara = 8;
+    if (absAngleDiff * rotatePara > PI) {
         cmd.rotate = sign * PI;
     }
     else {
-        cmd.rotate = sign * 15 * absAngleDiff;
+        cmd.rotate = sign * rotatePara * absAngleDiff;
     }
 
     // Limit the velocity according to the angle
