@@ -1,6 +1,6 @@
 #ifndef IO_HPP
 #define IO_HPP
-#include "codecraft2023.hpp"
+#include "inc_codecraft2023.hpp"
 
 void debug();
 void readPlat();

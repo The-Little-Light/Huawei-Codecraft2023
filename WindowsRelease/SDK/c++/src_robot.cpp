@@ -1,4 +1,4 @@
-#include "../inc/robot.hpp"
+#include "inc_robot.hpp"
 
 // 统计碰撞次数
 void robot::collisionCount() {    

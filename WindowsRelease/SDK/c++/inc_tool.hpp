@@ -1,6 +1,6 @@
 #ifndef TOOL_HPP
 #define TOOL_HPP
-#include "codecraft2023.hpp"
+#include "inc_codecraft2023.hpp"
 
 #define vec coordinate
 

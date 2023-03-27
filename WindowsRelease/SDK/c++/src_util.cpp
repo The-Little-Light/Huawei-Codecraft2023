@@ -1,4 +1,4 @@
-#include "../inc/util.hpp"
+#include "inc_util.hpp"
 
 void logInfo::addWallCol(int rtIdx) {
     ++wallCollisionNum[rtIdx];

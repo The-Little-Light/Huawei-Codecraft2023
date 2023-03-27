@@ -1,4 +1,4 @@
-#include "../inc/codecraft2023.hpp"
+#include "inc_codecraft2023.hpp"
 
 const double PI = acos(-1);
 

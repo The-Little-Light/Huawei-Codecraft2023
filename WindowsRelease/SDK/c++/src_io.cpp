@@ -1,4 +1,4 @@
-#include "../inc/io.hpp"
+#include "inc_io.hpp"
 
 
 void readPlat() {

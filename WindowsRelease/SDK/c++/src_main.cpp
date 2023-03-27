@@ -5,7 +5,7 @@
  * @LastEditors: Xzh
  * @Description: 
  */
-#include "../inc/codecraft2023.hpp"
+#include "inc_codecraft2023.hpp"
 using namespace std;
 
 int K;                              // 工作台数
