@@ -3,8 +3,8 @@
 // 统计碰撞次数
 void robot::collisionCount() {    
     if ((pcvc - cvc >= 0.001) && (cvc > 0.79)) {
-        double robotRadius = 0.45; // 机器人半径
-        if (taskQueue.size() == 1) {
+        double robotRadius = 0.45;  // 机器人初始半径
+        if (pd_id) {                // 携带物品时半径加大
             robotRadius = 0.53;
         }
         robotRadius += 0.1;

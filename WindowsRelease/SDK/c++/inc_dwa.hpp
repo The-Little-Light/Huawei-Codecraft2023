@@ -11,8 +11,12 @@ extern int dwaN;            // 预测N帧
 extern int dwaM;            // 速度空间采样点数
 extern const double dt;     // 帧长度
 
+extern double dwa_para1;    // 势能分量系数
+extern double dwa_para2;    // 目标角度系数
+extern double dwa_para3;    // 有效速度系数
 
-double motionEvaluate(vec postion,int rtIdx,vec speed);
+
+double motionEvaluate(coordinate postion,int rtIdx,vec speed);
 
 
 /**

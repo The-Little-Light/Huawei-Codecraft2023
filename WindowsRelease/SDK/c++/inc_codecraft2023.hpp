@@ -28,6 +28,7 @@ extern double para1;
 extern double para2;
 extern double para4;
 
+double cntPontEnergy(int, coordinate&);
 void collitionAvoidance();
 void ori_collitionAvoidance();
 void ori_solution();
