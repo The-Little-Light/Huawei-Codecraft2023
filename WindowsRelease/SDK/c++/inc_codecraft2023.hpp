@@ -10,6 +10,7 @@
 #include "inc_workbench.hpp"
 #include "inc_mcmf.hpp"
 #include "inc_util.hpp"
+#include "inc_dwa.hpp"
 using namespace std;
 
 extern int K;                               // 工作台数
