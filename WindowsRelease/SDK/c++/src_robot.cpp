@@ -22,7 +22,7 @@ void robot::collisionCount() {
 // 统计购买与出售次数
 void robot::buysellCount() {
     if (cmd.buy)  dataLog.buyProduct(rtIdx, wb[wb_id].type);
-    if (cmd.sell) dataLog.sellProduct(rtIdx, item);
+    if (cmd.sell) dataLog.sellProduct(rtIdx, pd_id);
 }
 
 // 设置临时目的地
