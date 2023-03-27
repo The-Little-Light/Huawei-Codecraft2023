@@ -1,6 +1,6 @@
 #ifndef MCMF_HPP
 #define MCMF_HPP
-#include "codecraft2023.hpp"
+#include "inc_codecraft2023.hpp"
 
 struct mcmf {
     

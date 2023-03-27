@@ -7,7 +7,7 @@
  *      引入最小费用最大流进行全局任务规划，优化任务分配
  */
 
-#include "../inc/codecraft2023.hpp"
+#include "inc_codecraft2023.hpp"
 
 
 void mcmf::init(){

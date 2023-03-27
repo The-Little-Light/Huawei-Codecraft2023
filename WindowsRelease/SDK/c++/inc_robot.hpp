@@ -1,6 +1,6 @@
 #ifndef ROBOT_HPP
 #define ROBOT_HPP
-#include "codecraft2023.hpp"
+#include "inc_codecraft2023.hpp"
 
 struct robot {
     int rtIdx;

@@ -1,15 +1,15 @@
 #ifndef SOLUTION_HPP
 #define SOLUTION_HPP
 #include <bits/stdc++.h>
-#include "define.hpp"
-#include "io.hpp"
-#include "tool.hpp"
-#include "math_tool.hpp"
-#include "mission.hpp"
-#include "robot.hpp"
-#include "workbench.hpp"
-#include "mcmf.hpp"
-#include "util.hpp"
+#include "inc_define.hpp"
+#include "inc_io.hpp"
+#include "inc_tool.hpp"
+#include "inc_math_tool.hpp"
+#include "inc_mission.hpp"
+#include "inc_robot.hpp"
+#include "inc_workbench.hpp"
+#include "inc_mcmf.hpp"
+#include "inc_util.hpp"
 using namespace std;
 
 extern int K;                               // 工作台数

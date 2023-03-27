@@ -1,6 +1,6 @@
 #ifndef DEFINE_HPP
 #define DEFINE_HPP
-#include "codecraft2023.hpp"
+#include "inc_codecraft2023.hpp"
 
 #define ROBOT_SIZE      4
 #define WORKBENCH_SIZE  50

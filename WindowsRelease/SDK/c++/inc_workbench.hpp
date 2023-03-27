@@ -1,6 +1,6 @@
 #ifndef WORKBENCH_HPP
 #define WORKBENCH_HPP
-#include "codecraft2023.hpp"
+#include "inc_codecraft2023.hpp"
 
 struct workbench {
     int type;       // 工作台类型 

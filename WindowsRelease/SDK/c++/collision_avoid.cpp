@@ -7,7 +7,7 @@
  *      引入势能场的概念，把碰撞处理从紧急避让变成引入势能较低点作为临时目的地（3-17）
  *      对势能场分布进行修正，加入角度考量（3-19）
  ***/
-#include "../inc/codecraft2023.hpp"
+#include "inc_codecraft2023.hpp"
 
 // 计算势能分布 a 为角度，lsp 为线速度向量
 double cntR(double a, vec& lsp, double asp) {
