@@ -20,7 +20,8 @@ double motionEvaluate(coordinate postion,int rtIdx,vec speed);
 
 
 /**
- * @descriptin: 输入机器人编号，返回最佳预测路径对应下的朝向和速度。
+ * @descriptin: 输入机器人编号，返回最佳预测路径对应下的(线速度,角速度)。
+ * constrait:速度非零
 */
 vec motionPredict(int rtIdx);
 
