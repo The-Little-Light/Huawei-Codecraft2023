@@ -36,7 +36,6 @@ void readInfo() {
             &rt[i].toward,
             &x, &y // location
         ); rt[i].location.set(x, y);
-        rt[i].item = rt[i].pd_id;
     }
     getchar();
     fgets(line, sizeof line, stdin); // receive OK

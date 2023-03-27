@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xzh
  * @Date: 2023-03-20 22:55:25
- * @LastEditTime: 2023-03-25 23:51:04
+ * @LastEditTime: 2023-03-27 15:49:26
  * @LastEditors: Xzh
  * @Description: 
  *      引入最小费用最大流进行全局任务规划，优化任务分配
@@ -342,7 +342,7 @@ void mcmf::adjustEdge(int rtIdx){
     edge&tmp = G[id][0]; // robot to S
     tmp.cap = 0,G[S][tmp.rev].cap = 1;
 
-    int nodeId = rt[rtIdx].nodeId,type = rt[rtIdx].pd_id;
+    int nodeId = rt[rtIdx].nodeId,type = wb[ProductId2Workbench[nodeId]].type;
     for (int i = 1,size = G[id].size(); i < size; i++) {
         edge&ed = G[id][i];
         if (ed.to != nodeId) {
@@ -394,7 +394,7 @@ void mcmf::adjustTask(int rtIdx){
     int id = robotId[rtIdx];
 
     rt[rtIdx].curTask.destId = -1;
-    int nextId = -1,nodeId = rt[rtIdx].nodeId,type = rt[rtIdx].pd_id;
+    int nextId = -1,nodeId = rt[rtIdx].nodeId;
 
     if (~nodeId) {
         if (G[nodeId][rtIdx].cap) {
@@ -516,12 +516,11 @@ void mcmf::checkDest(int rtIdx) {
                         setEdgeCap(id,0,0);
                     }
                     releaseNode(bot.nodeId,bot.pd_id); 
-                    bot.nodeId = -1,bot.pd_id = 0;
+                    bot.nodeId = -1;
                 } else {
                     if (!leftTime[workbenchId[bot.wb_id]]) {
                         // TODO: assume robot must buy material here,is it not realistic
                         lockNode(rtIdx,bot.wb_id);
-                        bot.pd_id = wb[bot.wb_id].type;
                     }
                 }
                 bot.curTask.destId = -1;
@@ -537,7 +536,7 @@ void mcmf::switcher() {
             bot.taskQueue.pop();
         }
         if (bot.nodeId != -1) {
-            bot.curMission.set(0, bot.curTask.destId, bot.pd_id);
+            bot.curMission.set(0, bot.curTask.destId, wb[ProductId2Workbench[bot.nodeId]].type);
             bot.taskQueue.push(bot.curTask);
         }
     }
