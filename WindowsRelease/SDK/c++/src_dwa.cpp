@@ -3,18 +3,18 @@
  * @Description: 
  *      带势能场的 DWA 动态避障算法
  ***/
-double dv0Max = 0.392155;       // 不携带物品时线最大加速度
-double dv1Max = 0.280491;       // 携带物品时线最大加速度
-double da0Max = 0.774646;       // 不携带物品时角最大加速度
-double da1Max = 0.401561;       // 携带物品时角最大加速度
+double dv0Max = 0.392155 * 100;       // 不携带物品时线最大加速度
+double dv1Max = 0.280491 * 100;       // 携带物品时线最大加速度
+double da0Max = 0.774646 * 100;       // 不携带物品时角最大加速度
+double da1Max = 0.401561 * 100;       // 携带物品时角最大加速度
 
-int dwaN;            // 预测N帧
-int dwaM;            // 速度空间采样点数
-const double dt;     // 帧长度
+int dwaN = 10;                  // 预测N帧
+int dwaM = 10;                  // 速度空间采样点数
+const double dt = 0.02;         // 帧长度
 
-double dwa_para1 = 0.5;    // 势能分量系数
-double dwa_para2 = 0.25;    // 目标角度系数
-double dwa_para3 = 0.25;    // 有效速度系数
+double dwa_para1 = 0.5;         // 势能分量系数
+double dwa_para2 = 0.25;        // 目标角度系数
+double dwa_para3 = 0.25;        // 有效速度系数
 
 
 // G(v, w) = dwa_para1*Pe(position) + dwa_para2*H(loca, dest, speed) + dwa_para3*V(speed)
@@ -167,6 +167,5 @@ vec motionPredict(int rtIdx) {
             pathEvaluate();
         }
     }
-
     return best;
 }

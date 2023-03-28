@@ -25,9 +25,12 @@ void ori_solution() {
         rt[rtIdx].cmd.clean(); // 清除之前指令设置
         rt[rtIdx].checkDest(); // 检查是否到达目的地
         rt[rtIdx].checkTask(); // 任务执行->运动指令
+        vec motion = motionPredict(rtIdx);
+        rt[rtIdx].cmd.forward = motion.x;
+        rt[rtIdx].cmd.rotate = motion.y;
     }
     // 碰撞避免
-    collitionAvoidance();
+    // collitionAvoidance();
     // ori_collitionAvoidance(); 
     return;
 }
