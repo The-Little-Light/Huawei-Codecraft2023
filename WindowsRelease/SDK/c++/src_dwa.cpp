@@ -3,6 +3,14 @@
  * @Description: 
  *      带势能场的 DWA 动态避障算法
  ***/
+double dv0Max = 0.392155;       // 不携带物品时线最大加速度
+double dv1Max = 0.280491;       // 携带物品时线最大加速度
+double da0Max = 0.774646;       // 不携带物品时角最大加速度
+double da1Max = 0.401561;       // 携带物品时角最大加速度
+
+int dwaN;            // 预测N帧
+int dwaM;            // 速度空间采样点数
+const double dt;     // 帧长度
 
 double dwa_para1 = 0.5;    // 势能分量系数
 double dwa_para2 = 0.25;    // 目标角度系数
@@ -11,8 +19,21 @@ double dwa_para3 = 0.25;    // 有效速度系数
 
 // G(v, w) = dwa_para1*Pe(postion) + dwa_para2*H(loca, dest, speed) + dwa_para3*V(speed)
 double motionEvaluate(coordinate postion,int rtIdx,vec speed) {
+    // Detect the location to confirm it is in the map
     robot& rbt = rt[rtIdx];
     coordinate& dest = rbt.haveTemDest ? rbt.temDest : rbt.curTask.destCo;
+    double robotRadius = 0.45;  // the radius of robot
+    if (rbt.pd_id) {
+        robotRadius = 0.53;     // the radius when carrying products
+    }
+    robotRadius += 0.1;
+    // check distence from robot to the wall
+    if (fabs(rbt.location.x) <= robotRadius || fabs(rbt.location.x - 50.0) <= robotRadius) {
+        return -1;
+    }
+    else if (fabs(rbt.location.y) <= robotRadius || fabs(rbt.location.y - 50.0) <= robotRadius) {
+        return -1;
+    }
     // caculate Pe(postion)
     double pe = 0;
     for (int otherRtIdx = 0; otherRtIdx < ROBOT_SIZE; ++otherRtIdx) {
