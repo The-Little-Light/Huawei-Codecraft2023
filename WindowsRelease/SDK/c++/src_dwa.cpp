@@ -27,6 +27,7 @@ double motionEvaluate(coordinate postion,int rtIdx,vec speed) {
         robotRadius = 0.53;     // the radius when carrying products
     }
     robotRadius += 0.1;
+
     // check distence from robot to the wall
     if (fabs(rbt.location.x) <= robotRadius || fabs(rbt.location.x - 50.0) <= robotRadius) {
         return -1;
@@ -34,6 +35,7 @@ double motionEvaluate(coordinate postion,int rtIdx,vec speed) {
     else if (fabs(rbt.location.y) <= robotRadius || fabs(rbt.location.y - 50.0) <= robotRadius) {
         return -1;
     }
+
     // caculate Pe(postion)
     double pe = 0;
     for (int otherRtIdx = 0; otherRtIdx < ROBOT_SIZE; ++otherRtIdx) {
@@ -41,11 +43,14 @@ double motionEvaluate(coordinate postion,int rtIdx,vec speed) {
             pe += cntPontEnergy(otherRtIdx, postion);
         }
     }
+
     // caculate H(postion, dest, speed)
     vec p2d(dest.x - postion.x, dest.y - postion.y);
     double heading = cntAngle(p2d, speed);
+
     // caculate V(speed), velocity to destination
     double v = dotProduct(p2d, speed) / modulusOfvector(p2d);
+    
     return dwa_para1*pe + dwa_para2*heading + dwa_para3*v;
 }
 
