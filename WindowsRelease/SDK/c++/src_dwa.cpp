@@ -31,32 +31,39 @@ double motionEvaluate(coordinate postion,int rtIdx,vec speed) {
 vec motionPredict(int rtIdx) {
     const double eps = 1e-6;
 
+    // 获取机器人最大加速度
     robot &bot = rt[rtIdx];
     int type = bot.pd_id > 0;
     double dvMax = type ? dv1Max : dv0Max;
     double daMax = type ? da1Max : da0Max;
 
+    // 维护最佳路径
     double score = -0.5;
     vec best = vec(0,0);
 
+    // 设置速度单位采样变化量
     dvMax = dvMax * dt;
     vec &curSpeed = bot.lsp;
     double curLineSpeed = modulusOfvector(curSpeed);
-    double dv = dvMax / dwaM, da = daMax / dwaM;
+    double dv = dvMax / dwaM;
 
+    // 设置角速度单位采样变化量
     daMax = daMax * dt;
-    double &curAsp = bot.asp;
+    double &curAsp = bot.asp, da = daMax / dwaM;
 
+    // 维护当前位置和朝向
     vec &curLocation = bot.location;
     double ly = curLocation.y, lx = curLocation.x, tmpy, tmpx;
     double curToward = bot.toward;
 
-    double tmpasp, tmpLineSpeed = curLineSpeed;
+    double tmpasp = curAsp, tmpLineSpeed = curLineSpeed;
 
-
-    auto pathEvaluate = [&]() -> double {
+    // 根据设置的1帧后的速度和角速度，预测N帧后的位置和朝向，并维护最佳路径评估得分
+    auto pathEvaluate = [&]() {
         double w1 = (tmpasp + curAsp) / 2.0,v1 = (tmpasp + curLineSpeed) / 2.0;
         tmpy = ly, tmpx = lx;
+
+        // 假设速度大小、角速度变化均匀，故第一帧按平均速度、角速度计算
         double tmpToward = curToward + dt * w1;
         if (fabs(w1) <= eps) {
             tmpx += v1 * dt * cos(curToward);
@@ -66,6 +73,7 @@ vec motionPredict(int rtIdx) {
             tmpy -= v1/w1 * (cos(curToward) - cos(tmpToward));
         }
 
+        // 假设后N-1帧速度大小、角速度不改变，计算位置和朝向
         w1 = tmpasp, v1 = tmpasp;
         if (fabs(w1) <= eps) {
             double tmp = v1 * dt * (N - 1);
@@ -78,46 +86,59 @@ vec motionPredict(int rtIdx) {
             tmpToward += tmp;
         }
 
-        return motionEvaluate(vec(tmpx,tmpy),rtIdx,vec(v1*cos(tmpToward),v1*sin(tmpToward)));
+        double tmpScore = motionEvaluate(vec(tmpx,tmpy),rtIdx,vec(v1*cos(tmpToward),v1*sin(tmpToward)));
+        if (tmpScore > score) score = tmpScore, best.set(tmpLineSpeed,tmpasp);
     };
 
 
+    // 总采样点数 : 4M^2 + 1
+
+    // 对[v,a]进行评估
+    pathEvaluate();
+
+
+    // 对[v, v + dvMax]进行采样
     for (int i = 0; i < dwaM; i++) {
         tmpLineSpeed += dv;
         if (tmpLineSpeed > 6 + eps) break;
         tmpasp = curAsp;
 
+        // 对[a, a + daMax]进行采样
         for (int j = 0; j < dwaM; j++) {
             tmpasp += da;
             if (tmpasp > PI + eps) break;
-            if (pathEvaluate() > score) best.set(tmpLineSpeed,tmpasp);
+            pathEvaluate();
         }
 
+        // 对[a - daMax, a]进行采样
         tmpasp = curAsp;
         for (int j = 0; j < dwaM; j++) {
             tmpasp -= da;
             if (tmpasp < -PI - eps) break;
-            if (pathEvaluate() > score) best.set(tmpLineSpeed,tmpasp);
+            pathEvaluate();
         }
     }
 
+    // 对[v - dvMax, v]进行采样
     tmpLineSpeed = curLineSpeed;
     for (int i = 0; i < dwaM; i++) {
         tmpLineSpeed -= dv;
         if (tmpLineSpeed <= -2 - eps) break;
         tmpasp = curAsp;
 
+        // 对[a, a + daMax]进行采样
         for (int j = 0; j < dwaM; j++) {
             tmpasp += da;
             if (tmpasp > PI + eps) break;
-            if (pathEvaluate() > score) best.set(tmpLineSpeed,tmpasp);
+            pathEvaluate();
         }
 
+        // 对[a - daMax, a]进行采样
         tmpasp = curAsp;
         for (int j = 0; j < dwaM; j++) {
             tmpasp -= da;
             if (tmpasp < -PI - eps) break;
-            if (pathEvaluate() > score) best.set(tmpLineSpeed,tmpasp);
+            pathEvaluate();
         }
     }
 
