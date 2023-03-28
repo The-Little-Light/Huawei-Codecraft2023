@@ -44,7 +44,7 @@ void robot::checkDest() {
     }
     else {
         if (!taskQueue.empty()) {
-            task& curTask = taskQueue.front();
+            curTask = taskQueue.front();
             if (wb_id == curTask.destId) {
                 // 到达当前工作目的地，交付工作
                 if (curTask.buy && wb[wb_id].pstatus) {
@@ -99,7 +99,7 @@ void robot::checkTask() {
     }
     else {
         // 执行当前任务，前往目的地
-        task& curTask = taskQueue.front();
+        curTask = taskQueue.front();
         setSpeed(curTask.destCo);
     }
 }

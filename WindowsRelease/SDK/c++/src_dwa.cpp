@@ -17,8 +17,8 @@ double dwa_para2 = 0.25;    // 目标角度系数
 double dwa_para3 = 0.25;    // 有效速度系数
 
 
-// G(v, w) = dwa_para1*Pe(postion) + dwa_para2*H(loca, dest, speed) + dwa_para3*V(speed)
-double motionEvaluate(coordinate postion,int rtIdx,vec speed) {
+// G(v, w) = dwa_para1*Pe(position) + dwa_para2*H(loca, dest, speed) + dwa_para3*V(speed)
+double motionEvaluate(coordinate position,int rtIdx,vec speed) {
     // Detect the location to confirm it is in the map
     robot& rbt = rt[rtIdx];
     coordinate& dest = rbt.haveTemDest ? rbt.temDest : rbt.curTask.destCo;
@@ -29,23 +29,23 @@ double motionEvaluate(coordinate postion,int rtIdx,vec speed) {
     robotRadius += 0.1;
 
     // check distence from robot to the wall
-    if (fabs(rbt.location.x) <= robotRadius || fabs(rbt.location.x - 50.0) <= robotRadius) {
+    if (fabs(position.x) <= robotRadius || fabs(position.x - 50.0) <= robotRadius) {
         return -1;
     }
-    else if (fabs(rbt.location.y) <= robotRadius || fabs(rbt.location.y - 50.0) <= robotRadius) {
+    else if (fabs(position.y) <= robotRadius || fabs(position.y - 50.0) <= robotRadius) {
         return -1;
     }
 
-    // caculate Pe(postion)
+    // caculate Pe(position)
     double pe = 0;
     for (int otherRtIdx = 0; otherRtIdx < ROBOT_SIZE; ++otherRtIdx) {
         if (otherRtIdx != rtIdx) {
-            pe += cntPontEnergy(otherRtIdx, postion);
+            pe += cntPontEnergy(otherRtIdx, position);
         }
     }
 
-    // caculate H(postion, dest, speed)
-    vec p2d(dest.x - postion.x, dest.y - postion.y);
+    // caculate H(position, dest, speed)
+    vec p2d(dest.x - position.x, dest.y - position.y);
     double heading = cntAngle(p2d, speed);
 
     // caculate V(speed), velocity to destination
